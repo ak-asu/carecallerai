@@ -7,13 +7,33 @@ const supabase = createClient(
 
 const TAVILY_URL = "https://api.tavily.com/search";
 
-Deno.serve(async () => {
-  const { data: meds } = await supabase
+Deno.serve(async (req) => {
+  let patientId: string | undefined;
+
+  try {
+    const body = await req.json();
+
+    patientId =
+      typeof body?.patientId === "string" ? body.patientId : undefined;
+  } catch {
+    patientId = undefined;
+  }
+
+  let medsQuery = supabase
     .from("medications")
     .select("id, patient_id, drug_name_normalized")
     .eq("active", true);
 
+  if (patientId) {
+    medsQuery = medsQuery.eq("patient_id", patientId);
+  }
+
+  const { data: meds } = await medsQuery;
+  let processed = 0;
+
   for (const med of meds ?? []) {
+    if (!med.drug_name_normalized?.trim()) continue;
+
     const res = await fetch(TAVILY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -39,7 +59,14 @@ Deno.serve(async () => {
       severity: 0,
       source: "stt_inferred",
     });
+
+    processed += 1;
   }
 
-  return new Response("ok");
+  return new Response(
+    JSON.stringify({ ok: true, processed, patientId: patientId ?? null }),
+    {
+      headers: { "Content-Type": "application/json" },
+    },
+  );
 });

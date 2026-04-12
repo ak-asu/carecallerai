@@ -41,12 +41,14 @@ describe("isSafetyCandidate", () => {
 describe("extractDrugCandidates", () => {
   it("finds known drug names", () => {
     const result = extractDrugCandidates("I take lexapro and metoprolol");
+
     expect(result).toContain("Escitalopram");
     expect(result).toContain("Metoprolol");
   });
 
   it("finds brand names from expanded dict", () => {
     const result = extractDrugCandidates("I need a refill for Ozempic");
+
     expect(result).toContain("Semaglutide");
   });
 });
@@ -77,42 +79,50 @@ describe("normalizeDrugName", () => {
 describe("flagNumericAmbiguity", () => {
   it("flags fifteen/fifty confusion", () => {
     expect(flagNumericAmbiguity("take fifty mg once a day")).toBe(
-      "take NUMERIC_AMBIGUOUS mg once a day"
+      "take NUMERIC_AMBIGUOUS mg once a day",
     );
     expect(flagNumericAmbiguity("take fifteen mg once a day")).toBe(
-      "take NUMERIC_AMBIGUOUS mg once a day"
+      "take NUMERIC_AMBIGUOUS mg once a day",
     );
   });
 
   it("flags forty/fourteen confusion", () => {
     expect(flagNumericAmbiguity("forty units of insulin")).toBe(
-      "NUMERIC_AMBIGUOUS units of insulin"
+      "NUMERIC_AMBIGUOUS units of insulin",
     );
     expect(flagNumericAmbiguity("fourteen units of insulin")).toBe(
-      "NUMERIC_AMBIGUOUS units of insulin"
+      "NUMERIC_AMBIGUOUS units of insulin",
     );
   });
 
   it("flags ninety/nineteen confusion", () => {
-    expect(flagNumericAmbiguity("ninety mg daily")).toBe("NUMERIC_AMBIGUOUS mg daily");
-    expect(flagNumericAmbiguity("nineteen mg daily")).toBe("NUMERIC_AMBIGUOUS mg daily");
+    expect(flagNumericAmbiguity("ninety mg daily")).toBe(
+      "NUMERIC_AMBIGUOUS mg daily",
+    );
+    expect(flagNumericAmbiguity("nineteen mg daily")).toBe(
+      "NUMERIC_AMBIGUOUS mg daily",
+    );
   });
 
   it("does not flag unambiguous numeric values", () => {
     expect(flagNumericAmbiguity("ten mg once a day")).toBe("ten mg once a day");
-    expect(flagNumericAmbiguity("100 mg twice daily")).toBe("100 mg twice daily");
+    expect(flagNumericAmbiguity("100 mg twice daily")).toBe(
+      "100 mg twice daily",
+    );
   });
 });
 
 describe("computeConfidence", () => {
   it("returns avg word confidence boosted by dict match", () => {
     const conf = computeConfidence([0.8, 0.9], true);
+
     expect(conf).toBeGreaterThan(0.9);
     expect(conf).toBeLessThanOrEqual(1.0);
   });
 
   it("returns avg without boost when not in dict", () => {
     const conf = computeConfidence([0.8, 0.9], false);
+
     expect(conf).toBeCloseTo(0.85, 1);
   });
 });

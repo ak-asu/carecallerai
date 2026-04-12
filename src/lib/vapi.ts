@@ -36,7 +36,8 @@ export async function runCallPipeline(params: {
   const negated = isNegated(transcript);
   const drugCandidates = extractDrugCandidates(transcript);
   const normalizedTranscript = normalizeDose(transcript);
-  const hasNumericAmbiguity = flagNumericAmbiguity(normalizedTranscript).includes("NUMERIC_AMBIGUOUS");
+  const hasNumericAmbiguity =
+    flagNumericAmbiguity(normalizedTranscript).includes("NUMERIC_AMBIGUOUS");
   const entityConfidence = computeConfidence(
     wordConfidences,
     drugCandidates.length > 0,

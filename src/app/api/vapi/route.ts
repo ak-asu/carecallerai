@@ -13,18 +13,68 @@ import {
 // Top 50 drug names for AssemblyAI wordBoost — improves transcription accuracy
 // for the brand/generic names most commonly mentioned in patient calls
 const WORD_BOOST = [
-  "warfarin", "coumadin", "lisinopril", "metformin", "glucophage",
-  "atorvastatin", "lipitor", "amlodipine", "norvasc", "sertraline",
-  "zoloft", "gabapentin", "neurontin", "omeprazole", "prilosec",
-  "furosemide", "lasix", "escitalopram", "lexapro", "metoprolol",
-  "lopressor", "losartan", "cozaar", "levothyroxine", "synthroid",
-  "albuterol", "ventolin", "prednisone", "fluticasone", "flonase",
-  "montelukast", "singulair", "pantoprazole", "protonix", "rosuvastatin",
-  "crestor", "simvastatin", "zocor", "clopidogrel", "plavix",
-  "hydrochlorothiazide", "spironolactone", "aldactone", "carvedilol",
-  "coreg", "valsartan", "diovan", "enalapril", "ramipril", "semaglutide",
-  "ozempic", "wegovy", "jardiance", "farxiga", "lantus", "humalog",
-  "prozac", "cymbalta", "wellbutrin", "klonopin", "ativan", "xanax",
+  "warfarin",
+  "coumadin",
+  "lisinopril",
+  "metformin",
+  "glucophage",
+  "atorvastatin",
+  "lipitor",
+  "amlodipine",
+  "norvasc",
+  "sertraline",
+  "zoloft",
+  "gabapentin",
+  "neurontin",
+  "omeprazole",
+  "prilosec",
+  "furosemide",
+  "lasix",
+  "escitalopram",
+  "lexapro",
+  "metoprolol",
+  "lopressor",
+  "losartan",
+  "cozaar",
+  "levothyroxine",
+  "synthroid",
+  "albuterol",
+  "ventolin",
+  "prednisone",
+  "fluticasone",
+  "flonase",
+  "montelukast",
+  "singulair",
+  "pantoprazole",
+  "protonix",
+  "rosuvastatin",
+  "crestor",
+  "simvastatin",
+  "zocor",
+  "clopidogrel",
+  "plavix",
+  "hydrochlorothiazide",
+  "spironolactone",
+  "aldactone",
+  "carvedilol",
+  "coreg",
+  "valsartan",
+  "diovan",
+  "enalapril",
+  "ramipril",
+  "semaglutide",
+  "ozempic",
+  "wegovy",
+  "jardiance",
+  "farxiga",
+  "lantus",
+  "humalog",
+  "prozac",
+  "cymbalta",
+  "wellbutrin",
+  "klonopin",
+  "ativan",
+  "xanax",
 ];
 
 function buildAssistantConfig() {
@@ -78,11 +128,13 @@ export async function POST(req: NextRequest) {
 
     case "call-started":
       await processCallStartedWebhook(body);
+
       return NextResponse.json({ ok: true });
 
     case "call-ended":
     case "end-of-call-report":
       await processEndOfCallWebhook(body);
+
       return NextResponse.json({ ok: true });
 
     case "tool-calls":

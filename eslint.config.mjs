@@ -1,10 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import react from "eslint-plugin-react";
+import nextVitals from "eslint-config-next/core-web-vitals";
 import unusedImports from "eslint-plugin-unused-imports";
-import _import from "eslint-plugin-import";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import jsxA11Y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-plugin-prettier";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
@@ -21,7 +18,7 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default defineConfig([globalIgnores([
+export default defineConfig([...nextVitals, globalIgnores([
     ".now/*",
     "**/*.css",
     "**/.changeset",
@@ -44,19 +41,11 @@ export default defineConfig([globalIgnores([
     "!**/tsup.config.ts",
 ]), {
     extends: fixupConfigRules(compat.extends(
-        "plugin:react/recommended",
         "plugin:prettier/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:jsx-a11y/recommended",
-        "plugin:@next/next/recommended-legacy",
     )),
 
     plugins: {
-        react: fixupPluginRules(react),
         "unused-imports": unusedImports,
-        import: fixupPluginRules(_import),
-        "@typescript-eslint": typescriptEslint,
-        "jsx-a11y": fixupPluginRules(jsxA11Y),
         prettier: fixupPluginRules(prettier),
     },
 

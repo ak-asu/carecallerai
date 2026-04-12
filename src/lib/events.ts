@@ -19,12 +19,20 @@ export async function fireEvent(event: AutomationEvent): Promise<void> {
     triggered_by: event.type,
   });
 
-  // For immediate events, invoke the relevant Edge Function
+  // For immediate events, invoke relevant Edge Functions.
+  // Handlers are expected to be idempotent and best-effort.
   if (event.type === "call.completed") {
     await invokeEdgeFunction("post-call-processor", event);
   }
-  // escalation.created: logged to automation_jobs for async pickup by a clinician notification handler
-  // appointment.updated: triggers appointment-monitor to check and reschedule
+  if (event.type === "escalation.created") {
+    await invokeEdgeFunction("escalation-handler", event);
+  }
+
+  if (event.type === "correction.created") {
+    await invokeEdgeFunction("correction-processor", event);
+  }
+
+  // appointment.updated triggers appointment-monitor to check and reschedule
   if (event.type === "appointment.updated") {
     await invokeEdgeFunction("appointment-monitor", event);
   }

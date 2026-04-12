@@ -4,11 +4,11 @@ import type { EntitySource } from "@/types";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { CorrectionModal } from "./CorrectionModal";
-
 import { GlassCard } from "@/components/ui/GlassCard";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { SourceTag } from "@/components/ui/SourceTag";
+
+import { CorrectionModal } from "./CorrectionModal";
 
 interface EntityCardProps {
   label: string;

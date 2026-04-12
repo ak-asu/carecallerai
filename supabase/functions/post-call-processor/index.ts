@@ -6,6 +6,30 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
+const TAVILY_URL = "https://api.tavily.com/search";
+
+const NEGATION_PATTERNS: RegExp[] = [
+  /\bno\b/i,
+  /\bnot\b/i,
+  /\bwithout\b/i,
+  /\bdenies?\b/i,
+  /\bdon'?t\b/i,
+  /\bdo not\b/i,
+  /\bno longer\b/i,
+];
+
+const COMMON_SYMPTOMS = [
+  "chest pain",
+  "shortness of breath",
+  "dizziness",
+  "nausea",
+  "fatigue",
+  "headache",
+  "swelling",
+  "fever",
+  "cough",
+];
+
 interface ExtractedEntity {
   type: "drug" | "dose" | "symptom" | "adherence" | "numeric";
   value_raw: string;
@@ -19,6 +43,113 @@ interface PostCallAnalysis {
   severity: number;
   entities: ExtractedEntity[];
   followUpRequired: boolean;
+}
+
+function clampSeverity(input: unknown): number {
+  const n = Number(input);
+
+  if (!Number.isFinite(n)) return 0;
+
+  return Math.min(10, Math.max(0, Math.round(n)));
+}
+
+function hasNegation(text: string): boolean {
+  return NEGATION_PATTERNS.some((pattern) => pattern.test(text));
+}
+
+function sanitizeEntities(entities: unknown): ExtractedEntity[] {
+  if (!Array.isArray(entities)) return [];
+
+  const out: ExtractedEntity[] = [];
+
+  for (const raw of entities) {
+    const record = raw as Partial<ExtractedEntity>;
+    const type = String(record.type ?? "").toLowerCase();
+    const valueRaw = String(record.value_raw ?? "").trim();
+    const valueNormalized = String(record.value_normalized ?? valueRaw).trim();
+
+    if (!valueRaw) continue;
+    if (!["drug", "dose", "symptom", "adherence", "numeric"].includes(type)) {
+      continue;
+    }
+
+    const confidenceRaw = Number(record.confidence ?? 0.5);
+    const confidence = Number.isFinite(confidenceRaw)
+      ? Math.min(1, Math.max(0, confidenceRaw))
+      : 0.5;
+
+    const negated = Boolean(record.negated) || hasNegation(valueRaw);
+
+    out.push({
+      type: type as ExtractedEntity["type"],
+      value_raw: valueRaw,
+      value_normalized: valueNormalized,
+      confidence,
+      negated,
+    });
+  }
+
+  return out;
+}
+
+function inferFallbackEntities(transcript: string): ExtractedEntity[] {
+  const lower = transcript.toLowerCase();
+  const inferred: ExtractedEntity[] = [];
+
+  for (const symptom of COMMON_SYMPTOMS) {
+    if (lower.includes(symptom)) {
+      inferred.push({
+        type: "symptom",
+        value_raw: symptom,
+        value_normalized: symptom,
+        confidence: 0.6,
+        negated: hasNegation(lower),
+      });
+    }
+  }
+
+  const doseMatches = transcript.matchAll(
+    /(\d+(?:\.\d+)?)\s*(mg|mcg|ml|units?)/gi,
+  );
+
+  for (const match of doseMatches) {
+    const dose = `${match[1]} ${match[2].toLowerCase()}`;
+
+    inferred.push({
+      type: "dose",
+      value_raw: dose,
+      value_normalized: dose,
+      confidence: 0.55,
+      negated: false,
+    });
+  }
+
+  return inferred;
+}
+
+async function fetchSavingsLinks(
+  drugName: string,
+): Promise<Array<{ url: string; title: string }>> {
+  const res = await fetch(TAVILY_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      api_key: Deno.env.get("TAVILY_API_KEY"),
+      query: `${drugName} patient savings program coupon GoodRx`,
+      search_depth: "basic",
+      max_results: 2,
+      include_domains: ["goodrx.com", "needymeds.org", "pparx.org"],
+    }),
+  });
+
+  if (!res.ok) return [];
+
+  const data = await res.json();
+
+  return (data.results ?? []).map((r: { url: string; title: string }) => ({
+    url: r.url,
+    title: r.title,
+  }));
 }
 
 Deno.serve(async (req) => {
@@ -74,11 +205,20 @@ NEVER invent entities not present in the transcript.`;
     .trim();
 
   let parsed: PostCallAnalysis;
+
   try {
     parsed = JSON.parse(text);
   } catch {
     console.error("Failed to parse Gemini response:", text);
+
     return new Response("parse_error");
+  }
+
+  const severity = clampSeverity(parsed?.severity);
+  let entities = sanitizeEntities(parsed?.entities);
+
+  if (entities.length === 0) {
+    entities = inferFallbackEntities(call.transcript);
   }
 
   // Update call record
@@ -86,7 +226,7 @@ NEVER invent entities not present in the transcript.`;
     .from("calls")
     .update({
       summary: parsed.summary,
-      severity_score: parsed.severity,
+      severity_score: severity,
     })
     .eq("id", callId);
 
@@ -94,13 +234,13 @@ NEVER invent entities not present in the transcript.`;
   await supabase
     .from("patients")
     .update({
-      severity_score: parsed.severity,
+      severity_score: severity,
       last_call_at: new Date().toISOString(),
     })
     .eq("id", patientId);
 
   // Insert structured entities into call_entities
-  for (const entity of parsed.entities ?? []) {
+  for (const entity of entities) {
     await supabase.from("call_entities").insert({
       call_id: callId,
       patient_id: patientId,
@@ -116,16 +256,17 @@ NEVER invent entities not present in the transcript.`;
   }
 
   // Insert symptoms separately for the symptoms table (from entity list)
-  const symptomEntities = (parsed.entities ?? []).filter(
+  const symptomEntities = entities.filter(
     (e) => e.type === "symptom" && !e.negated,
   );
+
   for (const s of symptomEntities) {
     await supabase.from("symptoms").insert({
       patient_id: patientId,
       call_id: callId,
       symptom_name: s.value_normalized,
-      severity: parsed.severity,
-      flagged_to_clinician: parsed.severity >= 7,
+      severity,
+      flagged_to_clinician: severity >= 7,
     });
   }
 
@@ -135,18 +276,43 @@ NEVER invent entities not present in the transcript.`;
     event_type: "call",
     content: {
       summary: parsed.summary,
-      severity: parsed.severity,
+      severity,
       callId,
-      entity_count: parsed.entities?.length ?? 0,
+      entity_count: entities.length,
     },
-    severity: parsed.severity,
-    flagged: parsed.severity >= 7,
+    severity,
+    flagged: severity >= 7,
     source: "stt_inferred",
   });
 
+  const drugEntities = entities.filter((e) => e.type === "drug" && !e.negated);
+
+  const uniqueDrugs = Array.from(
+    new Set(
+      drugEntities
+        .map((e) => e.value_normalized?.trim())
+        .filter((d): d is string => Boolean(d)),
+    ),
+  ).slice(0, 3);
+
+  for (const drugName of uniqueDrugs) {
+    const links = await fetchSavingsLinks(drugName);
+
+    if (!links.length) continue;
+
+    await supabase.from("patient_timeline").insert({
+      patient_id: patientId,
+      event_type: "savings_found",
+      content: { drugName, links },
+      severity: 0,
+      flagged: false,
+      source: "stt_inferred",
+    });
+  }
+
   // Schedule follow-up
-  if (parsed.severity >= 4) {
-    const hoursUntilFollowup = parsed.severity >= 7 ? 4 : 24;
+  if (severity >= 4 || Boolean(parsed.followUpRequired)) {
+    const hoursUntilFollowup = severity >= 7 ? 4 : 24;
     const scheduledAt = new Date(
       Date.now() + hoursUntilFollowup * 3600 * 1000,
     ).toISOString();
@@ -163,13 +329,13 @@ NEVER invent entities not present in the transcript.`;
   }
 
   // Escalation
-  if (parsed.severity >= 7) {
+  if (severity >= 7) {
     await supabase.from("escalations").insert({
       patient_id: patientId,
       call_id: callId,
       trigger_term: "high_severity_post_call",
       context_summary: parsed.summary,
-      severity: parsed.severity,
+      severity,
       status: "pending",
     });
   }
