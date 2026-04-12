@@ -1,12 +1,11 @@
 "use client";
-import { useRouter, usePathname } from "@/i18n/navigation";
+import { usePathname } from "@/i18n/navigation";
 
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
-  const router = useRouter();
   const pathname = usePathname();
 
   function switchLocale(locale: string) {
-    router.replace(pathname, { locale });
+    window.location.href = `/${locale}${pathname}`;
   }
 
   return (
