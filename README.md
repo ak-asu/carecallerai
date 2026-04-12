@@ -1,4 +1,4 @@
-# Next.js & HeroUI Template
+# CareCallerAI
 
 This is a template for creating applications using Next.js 15 (app directory) and HeroUI (v3).
 
