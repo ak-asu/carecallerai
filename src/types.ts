@@ -62,6 +62,10 @@ export interface Appointment {
   updated_at: string;
 }
 
+export interface AppointmentWithDoctor extends Appointment {
+  doctors: { name: string; specialty: string } | null;
+}
+
 export interface Doctor {
   id: string;
   name: string;

@@ -26,11 +26,14 @@ export function useRealtimeAppointment(
         (payload) => {
           setAppointments((prev) => {
             const updated = payload.new as Appointment;
-            const exists = prev.find((a) => a.id === updated.id);
+            const existing = prev.find((a) => a.id === updated.id);
+            // Spread existing first so joined fields (e.g. doctors) are preserved —
+            // realtime payloads are raw rows with no joined columns.
+            const merged = existing ? { ...existing, ...updated } : updated;
 
-            return exists
-              ? prev.map((a) => (a.id === updated.id ? updated : a))
-              : [...prev, updated];
+            return existing
+              ? prev.map((a) => (a.id === updated.id ? merged : a))
+              : [...prev, merged];
           });
         },
       )

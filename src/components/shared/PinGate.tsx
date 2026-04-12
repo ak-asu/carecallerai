@@ -7,7 +7,7 @@ import { GlassButton } from "@/components/ui/GlassButton";
 
 interface PinGateProps {
   token: string;
-  onVerified: (data: unknown) => void;
+  onVerified: (data: unknown, pin: string) => void;
 }
 
 export function PinGate({ token, onVerified }: PinGateProps) {
@@ -29,7 +29,7 @@ export function PinGate({ token, onVerified }: PinGateProps) {
     if (res.ok) {
       const data = await res.json();
 
-      onVerified(data);
+      onVerified(data, pin);
     } else {
       setError(t("error"));
     }

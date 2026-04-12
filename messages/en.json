@@ -23,7 +23,17 @@
       "context_enriched": "context matched",
       "patient_verified": "you confirmed",
       "clinician_verified": "doctor verified"
-    }
+    },
+    "profile": "Your Profile",
+    "severityLabel": "Severity",
+    "messageCareTeam": "Message Your Care Team",
+    "messagePlaceholder": "Type a message for your care team...",
+    "messageSend": "Send",
+    "messageSent": "Message sent",
+    "cancelAppt": "Cancel Appointment",
+    "requestChange": "Request Change",
+    "doctor": "Doctor",
+    "specialty": "Specialty"
   },
   "pin": {
     "title": "Enter your PIN to continue",
@@ -34,6 +44,18 @@
   "clinician": {
     "title": "Patient Timeline",
     "escalations": "Active Escalations",
-    "transcript": "Call Transcript"
+    "transcript": "Call Transcript",
+    "appointments": "Appointments",
+    "doctors": "Care Team",
+    "edit": "Edit",
+    "cancelEdit": "Cancel",
+    "reschedule": "Reschedule",
+    "newDatetime": "New date & time",
+    "reason": "Reason (optional)",
+    "save": "Save",
+    "saving": "Saving...",
+    "messages": "Patient Messages",
+    "noMessages": "No messages yet",
+    "severity": "Severity"
   }
 }
