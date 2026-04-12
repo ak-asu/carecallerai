@@ -15,7 +15,15 @@ export async function processCallStartedWebhook(
   const callId = getVapiCallId(body);
   const patientPhone = getVapiPatientPhone(body);
 
-  console.log("[webhook] call-started callId:", callId, "phone:", patientPhone);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawBody = body as any;
+  console.log(
+    "[webhook] call-started callId:", callId,
+    "phone:", patientPhone,
+    "raw_msg_call_customer:", rawBody?.message?.call?.customer?.number,
+    "raw_msg_customer:", rawBody?.message?.customer?.number,
+    "raw_call_customer:", rawBody?.call?.customer?.number,
+  );
 
   if (!callId || !patientPhone) {
     console.warn("[webhook] missing callId or phone — aborting");

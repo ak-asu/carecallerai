@@ -141,8 +141,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
 
     case "status-update":
-      // Backup: VAPI skips end-of-call-report on abrupt endings (silence-timed-out, errors).
-      // Handle status=ended here so post-call processing always runs.
+      // in-progress fires when call connects — use as backup for call setup
+      // in case assistant.started didn't carry the customer phone.
+      if (body.message?.status === "in-progress") {
+        await processCallStartedWebhook(body);
+      }
+      // ended fires on abrupt endings where VAPI skips end-of-call-report
       if (body.message?.status === "ended") {
         await processEndOfCallWebhook(body);
       }
