@@ -30,15 +30,18 @@ export async function processCallStartedWebhook(
     return;
   }
 
-  const { data: patient, error: patientErr } = await supabaseAdmin
+  const { data: patientRows, error: patientErr } = await supabaseAdmin
     .from("patients")
     .select("id, language")
     .eq("phone", patientPhone)
-    .single();
+    .limit(1);
+
+  const patient = patientRows?.[0] ?? null;
 
   console.log(
     "[webhook] patient lookup:",
     patient?.id ?? "NOT FOUND",
+    "rows:", patientRows?.length ?? 0,
     patientErr?.message ?? "",
   );
 
