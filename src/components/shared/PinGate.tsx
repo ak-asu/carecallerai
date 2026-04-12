@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -37,21 +38,26 @@ export function PinGate({ token, onVerified }: PinGateProps) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="page-shell flex min-h-screen items-center justify-center p-4">
       <GlassCard className="w-full max-w-sm">
-        <h1 className="mb-6 text-center text-lg font-medium text-white/80">
+        <p className="eyebrow mb-3 text-center">{t("eyebrow")}</p>
+        <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900">
           {t("title")}
         </h1>
         <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
           <input
-            className="rounded-xl border border-blue-500/20 bg-blue-950/30 px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50"
+            className="input-surface rounded-[1.5rem] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-200"
             placeholder={t("placeholder")}
             type="password"
             value={pin}
             onChange={(e) => setPin(e.target.value)}
           />
           {error && <p className="text-xs text-red-400">{error}</p>}
-          <GlassButton disabled={loading || !pin} type="submit">
+          <GlassButton
+            className="justify-center py-3"
+            disabled={loading || !pin}
+            type="submit"
+          >
             {loading ? "..." : t("submit")}
           </GlassButton>
         </form>

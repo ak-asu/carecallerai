@@ -1,7 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
+function getGeminiModel() {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      "Missing GEMINI_API_KEY. Set GEMINI_API_KEY before using Gemini.",
+    );
+  }
+
+  const genai = new GoogleGenerativeAI(apiKey);
+
+  return genai.getGenerativeModel({ model: "gemini-2.5-flash" });
+}
 
 export async function summarizeCall(
   transcript: string,
@@ -29,6 +40,7 @@ Return:
 Severity scale: 0=no concerns, 5=moderate (follow up within 24h), 8=urgent (follow up within 4h), 10=emergency.
 Be conservative — only escalate severity if clearly warranted by the transcript.`;
 
+  const model = getGeminiModel();
   const result = await model.generateContent(prompt);
   const text = result.response
     .text()

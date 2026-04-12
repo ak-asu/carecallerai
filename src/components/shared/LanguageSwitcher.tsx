@@ -1,33 +1,55 @@
 "use client";
-import { useEffect, useState } from "react";
 
-import { usePathname } from "@/i18n/navigation";
+import { startTransition } from "react";
+import { useTranslations } from "next-intl";
 
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
-  const pathname = usePathname();
-  const [pendingLocale, setPendingLocale] = useState<string | null>(null);
+  const t = useTranslations("languageSwitcher");
 
-  useEffect(() => {
-    if (pendingLocale !== null) {
-      window.location.href = `/${pendingLocale}${pathname}`;
+  function switchLocale(nextLocale: string) {
+    if (nextLocale === currentLocale) return;
+
+    const url = new URL(window.location.href);
+    const segments = url.pathname.split("/").filter(Boolean);
+
+    if (segments[0] === "en" || segments[0] === "es") {
+      segments[0] = nextLocale;
+    } else {
+      segments.unshift(nextLocale);
     }
-  }, [pendingLocale, pathname]);
+
+    url.pathname = `/${segments.join("/")}`;
+
+    startTransition(() => {
+      window.location.assign(`${url.pathname}${url.search}${url.hash}`);
+    });
+  }
 
   return (
-    <div className="flex gap-2">
-      {["en", "es"].map((locale) => (
-        <button
-          key={locale}
-          className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
-            locale === currentLocale
-              ? "bg-blue-500/30 text-blue-300 border border-blue-500/40"
-              : "text-white/40 hover:text-white/70"
-          }`}
-          onClick={() => setPendingLocale(locale)}
-        >
-          {locale.toUpperCase()}
-        </button>
-      ))}
+    <div className="inline-flex items-center gap-3 rounded-full border border-white/60 bg-white/78 px-3 py-2 shadow-sm backdrop-blur-xl">
+      <span className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-500">
+        {t("label")}
+      </span>
+      <div className="flex gap-1 rounded-full bg-slate-100/80 p-1">
+        {["en", "es"].map((locale) => {
+          const active = locale === currentLocale;
+
+          return (
+            <button
+              key={locale}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition-colors ${
+                active
+                  ? "bg-white text-sky-700 shadow-sm"
+                  : "text-slate-500 hover:bg-white/80 hover:text-slate-700"
+              }`}
+              type="button"
+              onClick={() => switchLocale(locale)}
+            >
+              {locale.toUpperCase()}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -22,9 +22,7 @@ export function MedicationSection({
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-medium text-white/50 uppercase tracking-wider">
-        {t("medications")}
-      </h2>
+      <h2 className="eyebrow mb-4">{t("medications")}</h2>
       <div className="flex flex-col gap-2">
         {medications.map((med) => (
           <EntityCard

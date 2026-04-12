@@ -1,4 +1,64 @@
 {
+  "common": {
+    "language": "Idioma",
+    "notYet": "Todavía no",
+    "live": "En vivo",
+    "severityShort": "sev {severity}",
+    "appointmentStatus": {
+      "scheduled": "Programada",
+      "confirmed": "Confirmada",
+      "rescheduled": "Reprogramada",
+      "cancelled": "Cancelada"
+    },
+    "escalationStatus": {
+      "pending": "Pendiente",
+      "acknowledged": "Reconocida",
+      "resolved": "Resuelta"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Idioma"
+  },
+  "landing": {
+    "badge": "Plataforma CareCaller",
+    "title": "Mejor monitoreo del paciente, construido con los servicios que ya existen en este proyecto.",
+    "description": "Ahora presentamos CareCaller como un panel operativo real: una jerarquía de información más tranquila, señales de estado más claras y accesos directos a los flujos del paciente y del personal clínico que ya existen en esta app.",
+    "openPatientDashboard": "Abrir panel del paciente",
+    "openClinicianWorkspace": "Abrir espacio clínico",
+    "featureEyebrow": "Influencia de CareFlow",
+    "featureCards": {
+      "monitoring": {
+        "title": "Monitoreo que se siente vivo",
+        "description": "Convierte llamadas, contexto de medicación y lógica de escalación en un panel del estado del paciente fácil de entender de un vistazo."
+      },
+      "corrections": {
+        "title": "Las correcciones del paciente siguen en el circuito",
+        "description": "Los ajustes de medicación y los mensajes del equipo de atención vuelven directamente a la siguiente interacción sin agregar una nueva capa de servicios."
+      },
+      "clinician": {
+        "title": "Vista clínica hecha para actuar",
+        "description": "Escalaciones, llamadas recientes, citas y mensajes del paciente conviven en un solo lugar para que el plan de seguimiento tome una sola revisión en vez de cinco."
+      }
+    },
+    "workflowEyebrow": "Flujo de trabajo",
+    "workflowTitle": "Servicios existentes, historia más clara",
+    "workflowDescription": "Sin dependencias nuevas de backend, sin una capa falsa de datos demo y sin un motor de panel separado. La interfaz ahora se apoya en el stack actual de CareCaller en vez de ocultarlo detrás de tarjetas genéricas.",
+    "workflowSteps": {
+      "vapi": "Telefonía con Vapi",
+      "assembly": "STT médico de AssemblyAI",
+      "rules": "Reglas y controles de seguridad",
+      "context": "Contexto desde Supabase + memoria",
+      "groq": "Razonamiento con Groq",
+      "dashboards": "Paneles de paciente y clínico"
+    },
+    "changesEyebrow": "Qué cambió",
+    "changesTitle": "Ahora la experiencia vive en los paneles.",
+    "changes": {
+      "patient": "La vista del paciente resalta el estado de monitoreo, los próximos pasos y acciones de autoservicio más seguras.",
+      "clinician": "La vista clínica concentra el contexto asistencial en un diseño operativo más rápido.",
+      "ui": "La interfaz compartida ahora usa superficies más suaves, mejor tipografía y mejor espaciado móvil."
+    }
+  },
   "dashboard": {
     "title": "Tu Resumen de Atención",
     "lastCall": "De tu última llamada",
@@ -11,7 +71,7 @@
     "noData": "Sin datos aún",
     "loading": "Cargando...",
     "savings": "Información de ahorro",
-    "emergency": "Si no se siente seguro, llame al 911 inmediatamente",
+    "emergency": "Si no te sientes seguro, llama al 911 de inmediato",
     "staffWillContact": "Un miembro del personal se pondrá en contacto pronto",
     "followUpScheduled": "Se ha programado un seguimiento",
     "correct": "Corregir",
@@ -26,27 +86,83 @@
     },
     "profile": "Tu Perfil",
     "severityLabel": "Severidad",
-    "messageCareTeam": "Mensaje a tu Equipo de Atención",
+    "messageCareTeam": "Mensaje a tu equipo de atención",
     "messagePlaceholder": "Escribe un mensaje para tu equipo de atención...",
     "messageSend": "Enviar",
     "messageSent": "Mensaje enviado",
-    "cancelAppt": "Cancelar Cita",
-    "requestChange": "Solicitar Cambio",
+    "messageError": "No se pudo enviar. Inténtalo de nuevo.",
+    "cancelAppt": "Cancelar cita",
+    "requestChange": "Solicitar cambio",
+    "googleCalendarLink": "Agregar a Google Calendar",
     "doctor": "Doctor",
-    "specialty": "Especialidad"
+    "specialty": "Especialidad",
+    "secureAccess": "Acceso seguro del paciente",
+    "eyebrow": "Centro de monitoreo del paciente",
+    "headline": "El estado del paciente, sin perder el contexto asistencial.",
+    "subtitle": "Este panel reúne llamadas, medicamentos, mensajes y próximas citas en una sola vista mucho más cercana a CareFlow.",
+    "overview": "Resumen de monitoreo",
+    "responseWindow": "Ventana de respuesta",
+    "nextTouchpoint": "Próximo punto de contacto",
+    "currentSymptoms": "Síntomas activos",
+    "noSymptoms": "No hay síntomas activos registrados.",
+    "careTeam": "Equipo de atención",
+    "noCareTeam": "Todavía no hay médicos asociados.",
+    "corrections": "Correcciones del paciente",
+    "recommendedAction": "Siguiente mejor acción",
+    "medicationConfidence": "Confianza en la medicación",
+    "clinicianReady": "Preparación del equipo",
+    "messageSummary": "Flujo de mensajes del paciente",
+    "severityFormat": "{score}/10 de severidad",
+    "pendingMessagesMetric": "Mensajes pendientes: {count}",
+    "profileCard": "Perfil del paciente",
+    "languageLabel": "Idioma",
+    "lastSummaryLabel": "Último resumen",
+    "verifiedMeds": "medicamentos verificados",
+    "correctionsTimeline": "en la línea de tiempo",
+    "messageSummaryText": "{totalCount} mensajes registrados, {pendingCount} todavía esperando atención.",
+    "generalCare": "Atención general",
+    "monitoring": {
+      "high": {
+        "title": "Atención alta",
+        "summary": "Un seguimiento clínico debería ocurrir pronto. Conviene vigilar síntomas, mensajes y la próxima ventana de cita."
+      },
+      "watch": {
+        "title": "Vigilar de cerca",
+        "summary": "El estado actual parece lo bastante estable para monitoreo en casa, pero el equipo debe estar listo para un ajuste rápido."
+      },
+      "steady": {
+        "title": "Monitoreo estable",
+        "summary": "No hay una señal urgente activa en este momento. El mejor siguiente paso es mantener al paciente conectado y facilitar el próximo contacto."
+      }
+    },
+    "responseWindowValue": {
+      "withinHours": "Dentro de horas",
+      "sameDay": "El mismo día",
+      "routineFollowUp": "Seguimiento de rutina"
+    },
+    "responseWindowHint": "La severidad y el estado de escalación marcan qué tan rápido debe intervenir el equipo.",
+    "noVisitScheduled": "No hay visita programada",
+    "messagingFallback": "La mensajería es la vía de respaldo actual para actualizaciones.",
+    "pendingEscalations": "{count, plural, one {# escalación pendiente} other {# escalaciones pendientes}}",
+    "noActiveEscalation": "Sin escalación activa",
+    "latestPatientMessage": "Último mensaje del paciente: {date}",
+    "costSupport": "Apoyo de costos",
+    "costSupportEmpty": "Los programas de ahorro aparecerán aquí cuando la línea de tiempo registre opciones de ayuda para medicamentos activos.",
+    "emergencyHotline": "Llama al 911 ahora"
   },
   "pin": {
     "title": "Ingresa tu PIN para continuar",
     "placeholder": "PIN",
     "submit": "Continuar",
-    "error": "PIN incorrecto. Inténtalo de nuevo."
+    "error": "PIN incorrecto. Inténtalo de nuevo.",
+    "eyebrow": "Acceso seguro del paciente"
   },
   "clinician": {
     "title": "Historial del Paciente",
-    "escalations": "Escalaciones Activas",
-    "transcript": "Transcripción de Llamada",
+    "escalations": "Escalaciones abiertas",
+    "transcript": "Transcripción de llamada",
     "appointments": "Citas",
-    "doctors": "Equipo Médico",
+    "doctors": "Equipo médico",
     "edit": "Editar",
     "cancelEdit": "Cancelar",
     "reschedule": "Reprogramar",
@@ -54,8 +170,86 @@
     "reason": "Motivo (opcional)",
     "save": "Guardar",
     "saving": "Guardando...",
-    "messages": "Mensajes del Paciente",
-    "noMessages": "Sin mensajes aún",
-    "severity": "Severidad"
+    "messages": "Mensajes del paciente",
+    "noMessages": "Todavía no hay mensajes",
+    "severity": "Severidad",
+    "eyebrow": "Operaciones clínicas",
+    "subtitle": "Contexto del paciente, actividad reciente y próximos pasos en una sola vista de trabajo.",
+    "snapshot": "Resumen del paciente",
+    "activeMeds": "Medicaciones activas",
+    "activeSymptoms": "Síntomas activos",
+    "noSymptoms": "No hay síntomas abiertos registrados.",
+    "noMeds": "No hay medicaciones activas registradas.",
+    "currentState": "Estado actual",
+    "nextMove": "Mejor siguiente paso",
+    "recentCalls": "Llamadas recientes",
+    "noEscalations": "No hay escalaciones pendientes en este momento.",
+    "severityFormat": "{score}/10 de severidad",
+    "notFound": "Paciente no encontrado",
+    "lastCallLabel": "Última llamada",
+    "upcomingAppointmentLabel": "Próxima cita",
+    "messagesMetric": "Mensajes",
+    "escalationsMetric": "Escalaciones",
+    "state": {
+      "needsAttention": "Necesita atención clínica activa",
+      "moderateWatch": "Estado de vigilancia moderada",
+      "stableHomeMonitoring": "Monitoreo estable en casa"
+    },
+    "recommendedAction": {
+      "urgent": "Escala a revisión clínica y confirma hoy la ventana de seguimiento.",
+      "midWithAppointment": "Mantén la próxima cita y revisa los nuevos mensajes del paciente antes de la visita.",
+      "midWithoutAppointment": "Programa un control cercano y observa cualquier corrección de medicación o cambio de síntomas.",
+      "stable": "Continúa el monitoreo en casa y usa el próximo contacto para verificar la adherencia a la medicación."
+    },
+    "noCompletedCalls": "Todavía no se han registrado llamadas completadas para este paciente.",
+    "aiSummary": "Resumen de IA",
+    "fullTranscript": "Transcripción completa",
+    "trigger": "Disparador",
+    "saved": "Guardado",
+    "statusLabel": "Estado",
+    "reasonPlaceholder": "p. ej. médico no disponible, solicitud del paciente...",
+    "googleCalendarLink": "Agregar a Google Calendar"
+  },
+  "scheduling": {
+    "patientTitle": "Recomendaciones de citas",
+    "clinicianTitle": "Calendarios médicos",
+    "patientHeadline": "Especialistas cercanos para los síntomas activos del paciente",
+    "clinicianHeadline": "Turnos de seguimiento recomendados, ordenados por distancia",
+    "patientSubtitle": "Estas recomendaciones se construyen con los síntomas actuales del paciente y el archivo de horarios médicos que agregaste. Cada opción se ordena por distancia y por la próxima apertura disponible.",
+    "clinicianSubtitle": "Usa estos calendarios alineados con los síntomas para convertir el estado actual en un plan de seguimiento concreto. Reservar aquí crea una cita normal dentro del flujo actual de CareCaller.",
+    "calendarBadge": "Listo para Google Calendar",
+    "sortedByDistance": "Ordenado por distancia",
+    "distanceAway": "A {distance} mi",
+    "nextAvailable": "Próximo",
+    "recommendedFor": "Recomendado para",
+    "availableSlots": "Horarios disponibles",
+    "bookSlot": "Reservar",
+    "booking": "Reservando...",
+    "booked": "Cita programada.",
+    "bookingFailed": "No se pudo reservar ese horario. Prueba con otra opción.",
+    "noRecommendations": "No hay recomendaciones de cita basadas en síntomas en este momento."
+  },
+  "timeline": {
+    "type": {
+      "call": "Llamada",
+      "correction": "Corrección",
+      "appointment": "Cita",
+      "symptom_report": "Reporte de síntoma",
+      "escalation": "Escalación",
+      "savings_found": "Ahorro"
+    },
+    "content": {
+      "medication": "medicación",
+      "savingsFound": "Ahorro encontrado para {drug}: {count, plural, one {# opción} other {# opciones}}",
+      "callCompleted": "Llamada completada",
+      "escalationTriggered": "Se activó una escalación",
+      "correctionSubmitted": "Corrección enviada",
+      "appointmentConfirmed": "Cita confirmada",
+      "appointmentCancelled": "Cita cancelada",
+      "appointmentRescheduled": "Cita reprogramada",
+      "appointmentRescheduledWithReason": "Cita reprogramada: {reason}",
+      "appointmentUpdated": "Cita actualizada",
+      "symptomReported": "Síntoma reportado"
+    }
   }
 }

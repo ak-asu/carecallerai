@@ -11,11 +11,13 @@ interface GlassButtonProps {
 
 const variants = {
   primary:
-    "bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/30 text-blue-300",
-  secondary: "bg-white/5 hover:bg-white/10 border-white/10 text-white/70",
-  danger: "bg-red-500/20 hover:bg-red-500/30 border-red-500/30 text-red-300",
+    "border-transparent bg-[#1387d7] text-white shadow-[0_18px_32px_rgba(19,135,215,0.24)] hover:bg-[#0e79c1]",
+  secondary:
+    "border-slate-200 bg-white/86 text-slate-700 hover:border-slate-300 hover:bg-white",
+  danger:
+    "border-red-200 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100",
   success:
-    "bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-500/30 text-emerald-300",
+    "border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300 hover:bg-emerald-100",
 };
 
 export function GlassButton({
@@ -29,8 +31,8 @@ export function GlassButton({
   return (
     <button
       className={clsx(
-        "rounded-xl border px-4 py-2 text-sm font-medium",
-        "backdrop-blur-sm transition-all duration-200",
+        "rounded-full border px-4 py-2.5 text-sm font-semibold",
+        "transition-all duration-200",
         "disabled:opacity-40 disabled:cursor-not-allowed",
         variants[variant],
         className,

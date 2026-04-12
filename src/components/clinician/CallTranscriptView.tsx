@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { GlassCard } from "@/components/ui/GlassCard";
 
 export function CallTranscriptView({
@@ -7,20 +9,18 @@ export function CallTranscriptView({
   transcript: string;
   summary: string;
 }) {
+  const t = useTranslations("clinician");
+
   return (
     <GlassCard>
       {summary && (
-        <div className="mb-3 p-3 rounded-xl bg-blue-500/10 border border-blue-500/10">
-          <p className="text-xs text-blue-300 uppercase tracking-wider mb-1">
-            AI Summary
-          </p>
-          <p className="text-sm text-white/80">{summary}</p>
+        <div className="mb-4 rounded-[1.5rem] border border-sky-100 bg-sky-50 p-4">
+          <p className="eyebrow mb-2">{t("aiSummary")}</p>
+          <p className="text-sm leading-7 text-slate-700">{summary}</p>
         </div>
       )}
-      <p className="text-xs text-white/40 uppercase tracking-wider mb-2">
-        Full Transcript
-      </p>
-      <p className="text-sm text-white/60 whitespace-pre-wrap leading-relaxed">
+      <p className="eyebrow mb-3">{t("fullTranscript")}</p>
+      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-600">
         {transcript}
       </p>
     </GlassCard>

@@ -2,6 +2,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 
 import { HtmlLang } from "@/components/shared/HtmlLang";
+import { fontMono, fontSans } from "@/config/fonts";
 
 export default async function LocaleLayout({
   children,
@@ -15,7 +16,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body>
+      <body className={`${fontSans.variable} ${fontMono.variable} antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <HtmlLang locale={locale} />
           {children}

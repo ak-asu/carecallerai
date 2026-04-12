@@ -12,6 +12,10 @@ export function useRealtimeAppointment(
   const [appointments, setAppointments] = useState<Appointment[]>(initial);
 
   useEffect(() => {
+    setAppointments(initial);
+  }, [initial]);
+
+  useEffect(() => {
     if (!patientId) return;
     const channel = supabaseBrowser
       .channel(`appointments:${patientId}`)

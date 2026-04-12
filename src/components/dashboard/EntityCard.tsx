@@ -66,10 +66,12 @@ export function EntityCard({
         className={`flex items-center justify-between gap-3 ${borderByConfidence(confidence, contradiction)}`}
       >
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-white/40 uppercase tracking-wider">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
             {label}
           </p>
-          <p className="mt-0.5 font-medium text-white truncate">{value}</p>
+          <p className="mt-1 truncate text-base font-semibold text-slate-900">
+            {value}
+          </p>
           <div className="mt-1.5">
             <SourceTag
               locale={locale}
@@ -87,7 +89,7 @@ export function EntityCard({
             </GlassButton>
           </div>
         )}
-        {confirmed && <span className="text-emerald-400 text-lg">✓</span>}
+        {confirmed && <span className="text-lg text-emerald-600">✓</span>}
       </GlassCard>
       {showModal && (
         <CorrectionModal

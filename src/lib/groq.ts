@@ -2,7 +2,23 @@ import type { GroqExtractionResult } from "@/types";
 
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+let groq: Groq | null = null;
+
+function getGroqClient() {
+  const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      "Missing GROQ_API_KEY. Set GROQ_API_KEY before using Groq.",
+    );
+  }
+
+  if (!groq) {
+    groq = new Groq({ apiKey });
+  }
+
+  return groq;
+}
 
 const AGENT_PROMPTS = {
   intake: (lang: string) =>
@@ -66,6 +82,7 @@ Respond ONLY with valid JSON matching this exact structure:
 }
 Rules: Never invent medications. If unsure, set action to "clarified" and ask. If safety trigger is negated ("no chest pain"), set safety_trigger.detected = false.`;
 
+  const groq = getGroqClient();
   const completion = await groq.chat.completions.create({
     model: "llama-3.1-8b-instant",
     messages: [

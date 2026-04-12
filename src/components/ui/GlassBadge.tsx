@@ -7,12 +7,12 @@ interface GlassBadgeProps {
 }
 
 const colors = {
-  blue: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  emerald: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  amber: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  red: "bg-red-500/20 text-red-300 border-red-500/30",
-  purple: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  cyan: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  blue: "border-sky-200 bg-sky-50 text-sky-700",
+  emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  amber: "border-amber-200 bg-amber-50 text-amber-700",
+  red: "border-red-200 bg-red-50 text-red-700",
+  purple: "border-violet-200 bg-violet-50 text-violet-700",
+  cyan: "border-cyan-200 bg-cyan-50 text-cyan-700",
 };
 
 export function GlassBadge({
@@ -23,7 +23,7 @@ export function GlassBadge({
   return (
     <span
       className={clsx(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-full border px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.18em]",
         colors[color],
         className,
       )}

@@ -1,4 +1,64 @@
 {
+  "common": {
+    "language": "Language",
+    "notYet": "Not yet",
+    "live": "Live",
+    "severityShort": "sev {severity}",
+    "appointmentStatus": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "rescheduled": "Rescheduled",
+      "cancelled": "Cancelled"
+    },
+    "escalationStatus": {
+      "pending": "Pending",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Language"
+  },
+  "landing": {
+    "badge": "CareCaller platform",
+    "title": "Better patient monitoring, built from the services already in this project.",
+    "description": "We now frame CareCaller like an actual operating dashboard: calmer information hierarchy, stronger state cues, and direct paths into the patient and clinician workflows that already exist in this app.",
+    "openPatientDashboard": "Open patient dashboard",
+    "openClinicianWorkspace": "Open clinician workspace",
+    "featureEyebrow": "CareFlow influence",
+    "featureCards": {
+      "monitoring": {
+        "title": "Monitoring that feels alive",
+        "description": "Turn calls, medication context, and escalation logic into a patient state dashboard that is easy to trust at a glance."
+      },
+      "corrections": {
+        "title": "Patient corrections stay in the loop",
+        "description": "Medication fixes and care-team messages feed directly back into the next interaction without adding a new service layer."
+      },
+      "clinician": {
+        "title": "Clinician view built for action",
+        "description": "Escalations, recent calls, appointments, and patient messages sit together so a follow-up plan takes one pass instead of five."
+      }
+    },
+    "workflowEyebrow": "Workflow",
+    "workflowTitle": "Existing services, clearer story",
+    "workflowDescription": "No new backend dependencies, no fake demo data layer, and no separate dashboard engine. The UI now leans into the current CareCaller stack instead of hiding it behind generic cards.",
+    "workflowSteps": {
+      "vapi": "Vapi telephony",
+      "assembly": "AssemblyAI medical STT",
+      "rules": "Rules and safety checks",
+      "context": "Context from Supabase + memory",
+      "groq": "Groq reasoning",
+      "dashboards": "Patient and clinician dashboards"
+    },
+    "changesEyebrow": "What changed",
+    "changesTitle": "The dashboards now carry the experience.",
+    "changes": {
+      "patient": "Patient view emphasizes monitoring state, next steps, and safer self-service actions.",
+      "clinician": "Clinician view condenses the care context into a faster operations layout.",
+      "ui": "Shared UI now uses softer surfaces, stronger typography, and better mobile spacing."
+    }
+  },
   "dashboard": {
     "title": "Your Care Summary",
     "lastCall": "From your last call",
@@ -30,20 +90,76 @@
     "messagePlaceholder": "Type a message for your care team...",
     "messageSend": "Send",
     "messageSent": "Message sent",
+    "messageError": "Failed to send. Please try again.",
     "cancelAppt": "Cancel Appointment",
     "requestChange": "Request Change",
+    "googleCalendarLink": "Add to Google Calendar",
     "doctor": "Doctor",
-    "specialty": "Specialty"
+    "specialty": "Specialty",
+    "secureAccess": "Secure patient access",
+    "eyebrow": "Patient monitoring center",
+    "headline": "Patient state, without losing the care context.",
+    "subtitle": "This dashboard pulls calls, medications, messages, and upcoming appointments into a single view that feels much closer to CareFlow.",
+    "overview": "Monitoring overview",
+    "responseWindow": "Response window",
+    "nextTouchpoint": "Next touchpoint",
+    "currentSymptoms": "Active symptoms",
+    "noSymptoms": "No active symptoms are currently logged.",
+    "careTeam": "Care team",
+    "noCareTeam": "No associated doctors yet.",
+    "corrections": "Patient corrections",
+    "recommendedAction": "Best next action",
+    "medicationConfidence": "Medication confidence",
+    "clinicianReady": "Team readiness",
+    "messageSummary": "Patient message flow",
+    "severityFormat": "{score}/10 severity",
+    "pendingMessagesMetric": "Pending messages: {count}",
+    "profileCard": "Patient profile",
+    "languageLabel": "Language",
+    "lastSummaryLabel": "Last summary",
+    "verifiedMeds": "verified meds",
+    "correctionsTimeline": "on the timeline",
+    "messageSummaryText": "{totalCount} messages logged, {pendingCount} still awaiting attention.",
+    "generalCare": "General care",
+    "monitoring": {
+      "high": {
+        "title": "High attention",
+        "summary": "A clinician follow-up should happen soon. Keep an eye on symptoms, messages, and the next appointment window."
+      },
+      "watch": {
+        "title": "Watch closely",
+        "summary": "The current state looks stable enough for home monitoring, but the care team should stay ready for a rapid adjustment."
+      },
+      "steady": {
+        "title": "Steady monitoring",
+        "summary": "No urgent signal is active right now. The best next step is to keep the patient engaged and make the next touchpoint easy."
+      }
+    },
+    "responseWindowValue": {
+      "withinHours": "Within hours",
+      "sameDay": "Same day",
+      "routineFollowUp": "Routine follow-up"
+    },
+    "responseWindowHint": "Severity and escalation state drive how quickly the team should intervene.",
+    "noVisitScheduled": "No visit scheduled",
+    "messagingFallback": "Messaging is the current fallback path for updates.",
+    "pendingEscalations": "{count, plural, one {# pending escalation} other {# pending escalations}}",
+    "noActiveEscalation": "No active escalation",
+    "latestPatientMessage": "Latest patient message: {date}",
+    "costSupport": "Cost support",
+    "costSupportEmpty": "Savings programs will appear here when the timeline records assistance options for active medications.",
+    "emergencyHotline": "Call 911 now"
   },
   "pin": {
     "title": "Enter your PIN to continue",
     "placeholder": "PIN",
     "submit": "Continue",
-    "error": "Incorrect PIN. Please try again."
+    "error": "Incorrect PIN. Please try again.",
+    "eyebrow": "Secure patient access"
   },
   "clinician": {
     "title": "Patient Timeline",
-    "escalations": "Active Escalations",
+    "escalations": "Open escalations",
     "transcript": "Call Transcript",
     "appointments": "Appointments",
     "doctors": "Care Team",
@@ -56,6 +172,85 @@
     "saving": "Saving...",
     "messages": "Patient Messages",
     "noMessages": "No messages yet",
-    "severity": "Severity"
+    "severity": "Severity",
+    "eyebrow": "Clinician operations",
+    "subtitle": "Patient context, recent activity, and the next care moves in a single working view.",
+    "snapshot": "Patient snapshot",
+    "activeMeds": "Active medications",
+    "activeSymptoms": "Active symptoms",
+    "noSymptoms": "No open symptoms are currently recorded.",
+    "noMeds": "No active medications are currently recorded.",
+    "currentState": "Current state",
+    "nextMove": "Best next move",
+    "recentCalls": "Recent calls",
+    "noEscalations": "No escalations are pending right now.",
+    "severityFormat": "{score}/10 severity",
+    "notFound": "Patient not found",
+    "lastCallLabel": "Last call",
+    "upcomingAppointmentLabel": "Upcoming appointment",
+    "messagesMetric": "Messages",
+    "escalationsMetric": "Escalations",
+    "state": {
+      "needsAttention": "Needs active clinician attention",
+      "moderateWatch": "Moderate watch state",
+      "stableHomeMonitoring": "Stable home monitoring"
+    },
+    "recommendedAction": {
+      "urgent": "Escalate to clinician review and confirm the follow-up window today.",
+      "midWithAppointment": "Keep the next appointment intact and review new patient messages before the visit.",
+      "midWithoutAppointment": "Schedule a near-term check-in and watch for any medication corrections or symptom drift.",
+      "stable": "Continue home monitoring and use the next outreach touchpoint to verify medication adherence."
+    },
+    "noCompletedCalls": "No completed calls have been logged for this patient yet.",
+    "aiSummary": "AI Summary",
+    "fullTranscript": "Full Transcript",
+    "trigger": "Trigger",
+    "saved": "Saved",
+    "statusLabel": "Status",
+    "reasonPlaceholder": "e.g. Doctor unavailable, patient request..."
+    ,
+    "googleCalendarLink": "Add to Google Calendar"
+  },
+  "scheduling": {
+    "patientTitle": "Appointment recommendations",
+    "clinicianTitle": "Doctor calendars",
+    "patientHeadline": "Closest specialists for the patient’s active symptoms",
+    "clinicianHeadline": "Recommended follow-up slots, ranked by distance",
+    "patientSubtitle": "These recommendations are built from the patient’s current symptoms and the doctor schedule file you added. Each option is sorted by distance and next available opening.",
+    "clinicianSubtitle": "Use these symptom-matched calendars to turn the current state into a concrete follow-up plan. Booking here creates a normal appointment in the existing CareCaller flow.",
+    "calendarBadge": "Google Calendar-ready",
+    "sortedByDistance": "Sorted by distance",
+    "distanceAway": "{distance} mi away",
+    "nextAvailable": "Next",
+    "recommendedFor": "Recommended for",
+    "availableSlots": "Available slots",
+    "bookSlot": "Book slot",
+    "booking": "Booking...",
+    "booked": "Appointment scheduled.",
+    "bookingFailed": "Could not schedule that slot. Try another option.",
+    "noRecommendations": "No symptom-based appointment recommendations are available right now."
+  },
+  "timeline": {
+    "type": {
+      "call": "Call",
+      "correction": "Correction",
+      "appointment": "Appointment",
+      "symptom_report": "Symptom report",
+      "escalation": "Escalation",
+      "savings_found": "Savings"
+    },
+    "content": {
+      "medication": "medication",
+      "savingsFound": "Savings found for {drug}: {count, plural, one {# option} other {# options}}",
+      "callCompleted": "Call completed",
+      "escalationTriggered": "Escalation triggered",
+      "correctionSubmitted": "Correction submitted",
+      "appointmentConfirmed": "Appointment confirmed",
+      "appointmentCancelled": "Appointment cancelled",
+      "appointmentRescheduled": "Appointment rescheduled",
+      "appointmentRescheduledWithReason": "Appointment rescheduled: {reason}",
+      "appointmentUpdated": "Appointment updated",
+      "symptomReported": "Symptom reported"
+    }
   }
 }

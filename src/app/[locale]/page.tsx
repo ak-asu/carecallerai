@@ -1,7 +1,21 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
-import { GlassCard } from "@/components/ui/GlassCard";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { GlassBadge } from "@/components/ui/GlassBadge";
+import { GlassButton } from "@/components/ui/GlassButton";
+import { GlassCard } from "@/components/ui/GlassCard";
+
+const featureKeys = ["monitoring", "corrections", "clinician"] as const;
+const workflowKeys = [
+  "vapi",
+  "assembly",
+  "rules",
+  "context",
+  "groq",
+  "dashboards",
+] as const;
+const changeKeys = ["patient", "clinician", "ui"] as const;
 
 export default async function LandingPage({
   params,
@@ -9,111 +23,106 @@ export default async function LandingPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-
-  const features = [
-    {
-      icon: "📞",
-      title: "Proactive Check-ins",
-      desc: "Outbound calls for symptom collection and adherence tracking",
-    },
-    {
-      icon: "🏥",
-      title: "Inbound Requests",
-      desc: "Handles refills, scheduling, and patient questions autonomously",
-    },
-    {
-      icon: "🧠",
-      title: "3-Layer NLP Pipeline",
-      desc: "Rules + context enrichment + Groq reasoning for high accuracy",
-    },
-    {
-      icon: "🔴",
-      title: "Smart Escalation",
-      desc: "Safety triggers with negation detection — no false alarms",
-    },
-    {
-      icon: "📊",
-      title: "Patient Dashboard",
-      desc: "Real-time corrections feed back into the next call",
-    },
-    {
-      icon: "🔁",
-      title: "Event-Driven Automation",
-      desc: "Doctor changes, severity scores, and corrections trigger smart workflows",
-    },
-  ];
+  const t = await getTranslations({ locale, namespace: "landing" });
 
   return (
-    <div className="min-h-screen p-6 max-w-4xl mx-auto">
-      {/* Hero */}
-      <div className="py-16 text-center">
-        <GlassBadge className="mb-4" color="cyan">
-          Healthcare Voice AI
-        </GlassBadge>
-        <h1 className="text-4xl font-bold text-white mb-4">
-          CareCaller <span className="text-blue-400">AI</span>
-        </h1>
-        <p className="text-lg text-white/60 max-w-xl mx-auto">
-          Owns what happens between appointments. Calls patients, understands
-          them accurately, acts intelligently.
-        </p>
-        <div className="mt-8 flex gap-3 justify-center">
-          <Link
-            className="rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-300 px-6 py-2.5 text-sm font-medium transition-colors"
-            href={`/${locale}/dashboard/demo-patient-token-abc123`}
-          >
-            View Patient Dashboard →
-          </Link>
-          <Link
-            className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 px-6 py-2.5 text-sm font-medium transition-colors"
-            href={`/${locale}/clinician/00000000-0000-0000-0000-000000000002`}
-          >
-            View Clinician View
-          </Link>
-        </div>
-      </div>
+    <div className="page-shell">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col gap-10 px-4 py-8 md:px-6 lg:px-8 lg:py-10">
+        <header className="flex flex-col gap-6 rounded-[2rem] border border-white/50 bg-white/55 px-6 py-6 shadow-soft backdrop-blur-xl md:px-8 md:py-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <GlassBadge className="mb-4" color="cyan">
+                {t("badge")}
+              </GlassBadge>
+              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 md:text-6xl">
+                {t("title")}
+              </h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
+                {t("description")}
+              </p>
+            </div>
+            <div className="grid gap-3 lg:min-w-[17rem]">
+              <LanguageSwitcher currentLocale={locale} />
+              <Link
+                className="inline-flex"
+                href={`/${locale}/dashboard/demo-patient-token-abc123`}
+              >
+                <GlassButton className="w-full justify-center py-3">
+                  {t("openPatientDashboard")}
+                </GlassButton>
+              </Link>
+              <Link
+                className="inline-flex"
+                href={`/${locale}/clinician/00000000-0000-0000-0000-000000000002`}
+              >
+                <GlassButton
+                  className="w-full justify-center py-3"
+                  variant="secondary"
+                >
+                  {t("openClinicianWorkspace")}
+                </GlassButton>
+              </Link>
+            </div>
+          </div>
 
-      {/* Features */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-12">
-        {features.map((f) => (
-          <GlassCard key={f.title}>
-            <span className="text-2xl">{f.icon}</span>
-            <h3 className="mt-2 font-medium text-white">{f.title}</h3>
-            <p className="mt-1 text-sm text-white/50">{f.desc}</p>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {featureKeys.map((key) => (
+              <GlassCard key={key} className="rounded-[1.75rem]">
+                <p className="eyebrow mb-3">{t("featureEyebrow")}</p>
+                <h2 className="text-2xl font-semibold text-slate-900">
+                  {t(`featureCards.${key}.title`)}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  {t(`featureCards.${key}.description`)}
+                </p>
+              </GlassCard>
+            ))}
+          </div>
+        </header>
+
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.9fr)]">
+          <GlassCard className="rounded-[2rem]">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="eyebrow mb-3">{t("workflowEyebrow")}</p>
+                <h2 className="text-3xl font-semibold text-slate-900">
+                  {t("workflowTitle")}
+                </h2>
+              </div>
+              <p className="max-w-xl text-sm leading-7 text-slate-600">
+                {t("workflowDescription")}
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              {workflowKeys.map((key, index) => (
+                <span
+                  key={key}
+                  className={`rounded-full border px-4 py-2 text-sm font-semibold ${
+                    index === workflowKeys.length - 1
+                      ? "border-sky-200 bg-sky-50 text-sky-700"
+                      : "border-slate-200 bg-white text-slate-700"
+                  }`}
+                >
+                  {t(`workflowSteps.${key}`)}
+                </span>
+              ))}
+            </div>
           </GlassCard>
-        ))}
-      </div>
 
-      {/* Pipeline */}
-      <GlassCard glow>
-        <h2 className="font-medium text-white mb-4">Real-Time Pipeline</h2>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-white/60">
-          {[
-            "Vapi Telephony",
-            "→",
-            "AssemblyAI Medical STT",
-            "→",
-            "Layer 1: Rules",
-            "→",
-            "Layer 2: Context",
-            "→",
-            "Layer 3: Groq",
-            "→",
-            "ElevenLabs TTS",
-          ].map((step, index) => (
-            <span
-              key={`${step}-${index}`}
-              className={
-                step === "→"
-                  ? "text-blue-500"
-                  : "px-2.5 py-1 rounded-lg bg-white/5 border border-white/10"
-              }
-            >
-              {step}
-            </span>
-          ))}
-        </div>
-      </GlassCard>
+          <GlassCard className="surface-card-dark rounded-[2rem]">
+            <p className="eyebrow mb-3 text-cyan-300">{t("changesEyebrow")}</p>
+            <h2 className="text-3xl font-semibold text-white">
+              {t("changesTitle")}
+            </h2>
+            <ul className="mt-5 space-y-4 text-sm leading-7 text-slate-200/88">
+              {changeKeys.map((key) => (
+                <li key={key}>{t(`changes.${key}`)}</li>
+              ))}
+            </ul>
+          </GlassCard>
+        </section>
+      </div>
     </div>
   );
 }

@@ -47,11 +47,11 @@ export function CorrectionModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <GlassCard className="w-full max-w-md">
-        <h3 className="mb-4 font-medium text-white">
+        <h3 className="mb-4 text-lg font-semibold text-slate-900">
           {t("correct")} {label}
         </h3>
         <input
-          className="w-full rounded-xl border border-blue-500/20 bg-blue-950/30 px-4 py-2.5 text-white focus:outline-none focus:border-blue-500/50"
+          className="input-surface w-full rounded-[1.25rem] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-200"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
         />

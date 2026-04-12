@@ -73,6 +73,25 @@ export interface Doctor {
   phone: string;
   google_calendar_id: string | null;
   availability_last_synced: string | null;
+  location_miles?: number | null;
+}
+
+export interface RecommendedAppointmentSlot {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+}
+
+export interface DoctorRecommendation {
+  schedule_id: string;
+  doctor_id: string | null;
+  doctor_name: string;
+  specialty: string;
+  google_calendar_id: string;
+  distance_miles: number;
+  matched_symptoms: string[];
+  next_available_at: string | null;
+  slots: RecommendedAppointmentSlot[];
 }
 
 export interface Call {
@@ -145,4 +164,15 @@ export interface Escalation {
   status: EscalationStatus;
   clinician_notified_at: string | null;
   created_at: string;
+}
+
+export interface Symptom {
+  id: string;
+  patient_id: string | null;
+  call_id: string | null;
+  symptom_name: string;
+  severity: number | null;
+  onset_date: string | null;
+  resolved: boolean | null;
+  flagged_to_clinician: boolean | null;
 }

@@ -1,58 +1,15 @@
 "use client";
+
 import type { TimelineEvent } from "@/types";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { GlassBadge } from "@/components/ui/GlassBadge";
-
-function formatContent(event: TimelineEvent): string {
-  const c = event.content as Record<string, unknown>;
-
-  switch (event.event_type) {
-    case "savings_found": {
-      const drug = (c.drugName as string) ?? "medication";
-      const count = (c.links as unknown[])?.length ?? 0;
-
-      return `Savings found for ${drug}: ${count} option${count !== 1 ? "s" : ""}`;
-    }
-    case "call":
-      return (c.summary as string) ?? "Call completed";
-    case "escalation":
-      return (
-        (c.reason as string) ?? (c.summary as string) ?? "Escalation triggered"
-      );
-    case "correction":
-      return (
-        (c.summary as string) ??
-        (c.description as string) ??
-        "Correction submitted"
-      );
-    case "appointment": {
-      if (c.action === "confirmed") return "Appointment confirmed";
-      if (c.action === "cancelled") return "Appointment cancelled";
-      if (c.action === "rescheduled")
-        return `Appointment rescheduled${c.reason ? `: ${c.reason as string}` : ""}`;
-
-      return (
-        (c.summary as string) ??
-        (c.description as string) ??
-        "Appointment updated"
-      );
-    }
-    case "symptom_report":
-      return (
-        (c.summary as string) ?? (c.description as string) ?? "Symptom reported"
-      );
-    default:
-      return (
-        (c.summary as string) ??
-        (c.description as string) ??
-        (c.text as string) ??
-        event.event_type.replace(/_/g, " ")
-      );
-  }
-}
+import {
+  getTimelineEventContent,
+  getTimelineEventLabel,
+} from "@/lib/timelineText";
 
 const eventColor = {
   call: "blue",
@@ -64,15 +21,15 @@ const eventColor = {
 } as const;
 
 export function TimelineSection({ events }: { events: TimelineEvent[] }) {
-  const t = useTranslations("dashboard");
+  const locale = useLocale();
+  const tDashboard = useTranslations("dashboard");
+  const tTimeline = useTranslations("timeline");
 
   if (!events.length) return null;
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-medium text-white/50 uppercase tracking-wider">
-        {t("timeline")}
-      </h2>
+      <h2 className="eyebrow mb-4">{tDashboard("timeline")}</h2>
       <div className="flex flex-col gap-2">
         {events.map((event) => (
           <GlassCard key={event.id} className="flex items-start gap-3">
@@ -82,14 +39,17 @@ export function TimelineSection({ events }: { events: TimelineEvent[] }) {
                 "blue"
               }
             >
-              {event.event_type.replace("_", " ")}
+              {getTimelineEventLabel(event.event_type, tTimeline)}
             </GlassBadge>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-white/70 truncate">
-                {formatContent(event)}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-slate-700">
+                {getTimelineEventContent(event, tTimeline)}
               </p>
-              <p className="text-xs text-white/30 mt-0.5">
-                {new Date(event.created_at).toLocaleString()}
+              <p className="mt-1 text-xs text-slate-500">
+                {new Intl.DateTimeFormat(locale, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(event.created_at))}
               </p>
             </div>
           </GlassCard>

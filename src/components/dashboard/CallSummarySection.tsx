@@ -1,5 +1,6 @@
 "use client";
-import { useTranslations } from "next-intl";
+
+import { useLocale, useTranslations } from "next-intl";
 
 import { GlassCard } from "@/components/ui/GlassCard";
 
@@ -19,24 +20,24 @@ function severityDotColor(score: number): string {
 }
 
 export function CallSummarySection({ lastCall }: CallSummarySectionProps) {
+  const locale = useLocale();
   const t = useTranslations("dashboard");
 
   if (!lastCall) return null;
 
   return (
-    <GlassCard>
-      <p className="text-xs text-white/40 uppercase tracking-wider mb-2">
-        {t("lastCall")}
-      </p>
-      <p className="text-white/80 text-sm leading-relaxed">
-        {lastCall.summary}
-      </p>
+    <GlassCard className="h-full">
+      <p className="eyebrow mb-3">{t("lastCall")}</p>
+      <p className="text-sm leading-7 text-slate-700">{lastCall.summary}</p>
       <div className="mt-2 flex items-center gap-2">
         <span
-          className={`h-2 w-2 rounded-full shrink-0 ${severityDotColor(lastCall.severity_score)}`}
+          className={`h-2 w-2 shrink-0 rounded-full ${severityDotColor(lastCall.severity_score)}`}
         />
-        <p className="text-xs text-white/30">
-          {new Date(lastCall.ended_at).toLocaleString()}
+        <p className="text-xs text-slate-500">
+          {new Intl.DateTimeFormat(locale, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          }).format(new Date(lastCall.ended_at))}
         </p>
       </div>
     </GlassCard>
