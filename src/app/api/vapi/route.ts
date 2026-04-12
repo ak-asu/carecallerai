@@ -4,6 +4,8 @@ import {
   getVapiMessageType,
   parseAndVerifyVapiRequest,
 } from "@/lib/vapi-signature";
+
+export const dynamic = "force-dynamic";
 import {
   buildUnsupportedToolResults,
   processCallStartedWebhook,

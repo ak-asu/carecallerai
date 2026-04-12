@@ -19,7 +19,8 @@
       "Bash(pnpm exec:*)",
       "Bash(python:*)",
       "Bash(npx tsc:*)",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.get\\('exports',{}\\).keys\\(\\)]\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.get\\('exports',{}\\).keys\\(\\)]\")",
+      "Bash(curl:*)"
     ]
   }
 }
