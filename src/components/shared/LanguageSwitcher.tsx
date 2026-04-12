@@ -1,21 +1,17 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { routing } from "@/i18n/routing";
+import { usePathname } from "@/i18n/navigation";
 
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
-  const router = useRouter();
   const pathname = usePathname();
+  const [pendingLocale, setPendingLocale] = useState<string | null>(null);
 
-  function switchLocale(locale: string) {
-    // Replace only the leading locale segment to avoid false matches in path
-    const segments = pathname.split("/");
-
-    if (routing.locales.includes(segments[1] as "en" | "es")) {
-      segments[1] = locale;
+  useEffect(() => {
+    if (pendingLocale !== null) {
+      window.location.href = `/${pendingLocale}${pathname}`;
     }
-    router.push(segments.join("/"));
-  }
+  }, [pendingLocale, pathname]);
 
   return (
     <div className="flex gap-2">
@@ -27,7 +23,7 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
               ? "bg-blue-500/30 text-blue-300 border border-blue-500/40"
               : "text-white/40 hover:text-white/70"
           }`}
-          onClick={() => switchLocale(locale)}
+          onClick={() => setPendingLocale(locale)}
         >
           {locale.toUpperCase()}
         </button>

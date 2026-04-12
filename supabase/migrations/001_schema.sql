@@ -188,7 +188,7 @@ insert into patients (id, token, password_hash, name_alias, language, phone, sev
 values (
   '00000000-0000-0000-0000-000000000002',
   'demo-patient-token-abc123',
-  '$2b$10$placeholder', -- replace with real bcrypt hash in seed script
+  '$2b$10$yopof/0XQ2dRl8NvPfupgeYVk42/0obvaehg6SD4dLJlASPjbJrii', -- node -e "const b = require('bcryptjs'); b.hash('7291', 10).then(h => console.log(h));"
   'Patient Demo',
   'en',
   '+15550005678',

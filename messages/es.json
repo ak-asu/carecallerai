@@ -23,7 +23,17 @@
       "context_enriched": "coincidencia contextual",
       "patient_verified": "confirmado por ti",
       "clinician_verified": "verificado por médico"
-    }
+    },
+    "profile": "Tu Perfil",
+    "severityLabel": "Severidad",
+    "messageCareTeam": "Mensaje a tu Equipo de Atención",
+    "messagePlaceholder": "Escribe un mensaje para tu equipo de atención...",
+    "messageSend": "Enviar",
+    "messageSent": "Mensaje enviado",
+    "cancelAppt": "Cancelar Cita",
+    "requestChange": "Solicitar Cambio",
+    "doctor": "Doctor",
+    "specialty": "Especialidad"
   },
   "pin": {
     "title": "Ingresa tu PIN para continuar",
@@ -34,6 +44,18 @@
   "clinician": {
     "title": "Historial del Paciente",
     "escalations": "Escalaciones Activas",
-    "transcript": "Transcripción de Llamada"
+    "transcript": "Transcripción de Llamada",
+    "appointments": "Citas",
+    "doctors": "Equipo Médico",
+    "edit": "Editar",
+    "cancelEdit": "Cancelar",
+    "reschedule": "Reprogramar",
+    "newDatetime": "Nueva fecha y hora",
+    "reason": "Motivo (opcional)",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "messages": "Mensajes del Paciente",
+    "noMessages": "Sin mensajes aún",
+    "severity": "Severidad"
   }
 }

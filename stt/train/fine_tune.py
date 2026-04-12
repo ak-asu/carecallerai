@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Union
 
 import evaluate
-from datasets import Dataset
+from datasets import Dataset, concatenate_datasets
 from transformers import (
     WhisperForConditionalGeneration,
     WhisperProcessor,
@@ -83,6 +83,17 @@ def compute_metrics(pred) -> dict:
     return {"wer": round(wer, 2)}
 
 
+def _dataset_from_list_chunked(samples: list[dict], chunk_size: int = 256) -> Dataset:
+    """Build Dataset in chunks to avoid Arrow offset overflow on large arrays."""
+    chunks = [
+        Dataset.from_list(samples[i:i + chunk_size])
+        for i in range(0, len(samples), chunk_size)
+    ]
+    if not chunks:
+        raise ValueError("Cannot build dataset from 0 samples")
+    return chunks[0] if len(chunks) == 1 else concatenate_datasets(chunks)
+
+
 def build_dataset() -> tuple[Dataset, Dataset]:
     """Collect all samples, prepare features, split 95/5 train/eval."""
     all_raw = []
@@ -109,8 +120,8 @@ def build_dataset() -> tuple[Dataset, Dataset]:
 
     print(f"Valid samples after preparation: {len(processed)}")
     split = int(0.95 * len(processed))
-    train_ds = Dataset.from_list(processed[:split])
-    eval_ds = Dataset.from_list(processed[split:])
+    train_ds = _dataset_from_list_chunked(processed[:split])
+    eval_ds = _dataset_from_list_chunked(processed[split:])
     return train_ds, eval_ds
 
 

@@ -11,6 +11,13 @@ interface CallSummarySectionProps {
   } | null;
 }
 
+function severityDotColor(score: number): string {
+  if (score >= 7) return "bg-red-400";
+  if (score >= 4) return "bg-amber-400";
+
+  return "bg-emerald-400";
+}
+
 export function CallSummarySection({ lastCall }: CallSummarySectionProps) {
   const t = useTranslations("dashboard");
 
@@ -24,9 +31,14 @@ export function CallSummarySection({ lastCall }: CallSummarySectionProps) {
       <p className="text-white/80 text-sm leading-relaxed">
         {lastCall.summary}
       </p>
-      <p className="mt-2 text-xs text-white/30">
-        {new Date(lastCall.ended_at).toLocaleString()}
-      </p>
+      <div className="mt-2 flex items-center gap-2">
+        <span
+          className={`h-2 w-2 rounded-full shrink-0 ${severityDotColor(lastCall.severity_score)}`}
+        />
+        <p className="text-xs text-white/30">
+          {new Date(lastCall.ended_at).toLocaleString()}
+        </p>
+      </div>
     </GlassCard>
   );
 }

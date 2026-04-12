@@ -427,6 +427,7 @@ export type Database = {
       };
       notifications: {
         Row: {
+          created_at: string | null;
           id: string;
           language: string | null;
           message: string;
@@ -438,6 +439,7 @@ export type Database = {
           type: string;
         };
         Insert: {
+          created_at?: string | null;
           id?: string;
           language?: string | null;
           message: string;
@@ -449,6 +451,7 @@ export type Database = {
           type: string;
         };
         Update: {
+          created_at?: string | null;
           id?: string;
           language?: string | null;
           message?: string;
