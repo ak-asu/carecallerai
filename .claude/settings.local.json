@@ -12,7 +12,12 @@
       "Bash(npx vitest:*)",
       "Bash(pnpm info:*)",
       "Bash(node:*)",
-      "Bash(timeout 25 pnpm dev)"
+      "Bash(timeout 25 pnpm dev)",
+      "Bash(stt/.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python.exe -c ':*)",
+      "Bash(C:/Users/presyze/Projects/ASU/carecallerai/stt/.venv/Scripts/python.exe -c ':*)",
+      "Bash(pnpm exec:*)",
+      "Bash(python:*)"
     ]
   }
 }

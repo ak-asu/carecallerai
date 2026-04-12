@@ -115,9 +115,19 @@ def build_dataset() -> tuple[Dataset, Dataset]:
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--resume_from_checkpoint", type=str, default=None,
+                        help="Path to a checkpoint directory to resume training from")
+    args = parser.parse_args()
+
     print(f"CUDA available: {torch.cuda.is_available()}")
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}, VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}GB")
+
+    resume_path = args.resume_from_checkpoint
+    if resume_path:
+        print(f"Resuming from checkpoint: {resume_path}")
 
     print(f"Loading {MODEL_NAME}...")
     model = WhisperForConditionalGeneration.from_pretrained(MODEL_NAME)
@@ -162,7 +172,7 @@ def main():
     )
 
     print("Starting training...")
-    trainer.train()
+    trainer.train(resume_from_checkpoint=resume_path)
 
     final_dir = f"{CHECKPOINT_DIR}/whisper-telephony-medical-final"
     trainer.save_model(final_dir)
