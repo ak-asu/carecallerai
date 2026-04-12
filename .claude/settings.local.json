@@ -20,7 +20,9 @@
       "Bash(python:*)",
       "Bash(npx tsc:*)",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.get\\('exports',{}\\).keys\\(\\)]\")",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs"
     ]
   }
 }
