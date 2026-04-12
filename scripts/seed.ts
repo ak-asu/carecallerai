@@ -2,7 +2,9 @@
 // Sets demo patient PIN to 1234 and seeds medications + appointment for demo
 import bcrypt from 'bcryptjs'
 import { createClient } from '@supabase/supabase-js'
-import 'dotenv/config'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const supabaseServerKey = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY
 
