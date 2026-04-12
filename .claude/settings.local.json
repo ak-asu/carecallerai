@@ -22,7 +22,12 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.get\\('exports',{}\\).keys\\(\\)]\")",
       "Bash(curl:*)",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_context7_context7__query-docs"
+      "mcp__plugin_context7_context7__query-docs",
+      "mcp__plugin_supabase_supabase__list_projects",
+      "mcp__plugin_supabase_supabase__execute_sql",
+      "mcp__plugin_supabase_supabase__list_edge_functions",
+      "mcp__plugin_supabase_supabase__get_logs",
+      "mcp__plugin_supabase_supabase__deploy_edge_function"
     ]
   }
 }
