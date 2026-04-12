@@ -161,7 +161,12 @@ async function fetchSavingsLinks(
 }
 
 Deno.serve(async (req) => {
-  const { callId, patientId } = await req.json();
+  const body = await req.json();
+  const { callId, patientId, jobId } = body as {
+    callId: string;
+    patientId: string;
+    jobId?: string | null;
+  };
 
   const { data: call } = await supabase
     .from("calls")
@@ -422,6 +427,13 @@ NEVER invent entities not present in the transcript.`;
         body: { appointmentId: newAppt.id, patientId },
       });
     }
+  }
+
+  if (jobId) {
+    await supabase
+      .from("automation_jobs")
+      .update({ status: "completed", completed_at: new Date().toISOString(), result: { ok: true } })
+      .eq("id", jobId);
   }
 
   return new Response("ok");

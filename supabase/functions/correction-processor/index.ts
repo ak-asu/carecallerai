@@ -12,6 +12,7 @@ interface CorrectionEvent {
   type?: string;
   patientId?: string;
   correctionId?: string;
+  jobId?: string | null;
 }
 
 async function invokeFunction(name: string, payload: Record<string, unknown>) {
@@ -130,6 +131,13 @@ Deno.serve(async (req) => {
     flagged: false,
     source: "patient_verified",
   });
+
+  if (payload.jobId) {
+    await supabase
+      .from("automation_jobs")
+      .update({ status: "completed", completed_at: new Date().toISOString(), result: { ok: true } })
+      .eq("id", payload.jobId);
+  }
 
   return new Response(
     JSON.stringify({

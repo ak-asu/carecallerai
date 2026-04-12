@@ -12,29 +12,33 @@ export type AutomationEvent =
   | { type: "appointment.updated"; appointmentId: string; patientId: string };
 
 export async function fireEvent(event: AutomationEvent): Promise<void> {
-  await supabaseAdmin.from("automation_jobs").insert({
-    type: event.type,
-    status: "pending",
-    payload: event,
-    triggered_by: event.type,
-  });
+  // Insert the job and capture the ID so edge functions can mark it completed
+  const { data: job } = await supabaseAdmin
+    .from("automation_jobs")
+    .insert({
+      type: event.type,
+      status: "pending",
+      payload: event,
+      triggered_by: event.type,
+    })
+    .select("id")
+    .single();
 
-  // For immediate events, invoke relevant Edge Functions.
-  // Handlers are expected to be idempotent and best-effort.
+  const jobId: string | null = job?.id ?? null;
+  // Pass jobId so each function can mark the job completed when done
+  const payload = { ...event, jobId };
+
   if (event.type === "call.completed") {
-    await invokeEdgeFunction("post-call-processor", event);
+    await invokeEdgeFunction("post-call-processor", payload);
   }
   if (event.type === "escalation.created") {
-    await invokeEdgeFunction("escalation-handler", event);
+    await invokeEdgeFunction("escalation-handler", payload);
   }
-
   if (event.type === "correction.created") {
-    await invokeEdgeFunction("correction-processor", event);
+    await invokeEdgeFunction("correction-processor", payload);
   }
-
-  // appointment.updated triggers appointment-monitor to check and reschedule
   if (event.type === "appointment.updated") {
-    await invokeEdgeFunction("appointment-monitor", event);
+    await invokeEdgeFunction("appointment-monitor", payload);
   }
 }
 
