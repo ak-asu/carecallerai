@@ -14,6 +14,10 @@
     "emergency": "If you feel unsafe, call 911 immediately",
     "staffWillContact": "A staff member will contact you soon",
     "followUpScheduled": "A follow-up has been scheduled",
+    "correct": "Correct",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
     "source": {
       "stt_inferred": "system inferred",
       "context_enriched": "context matched",

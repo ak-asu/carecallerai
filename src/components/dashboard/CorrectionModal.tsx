@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { GlassButton } from '@/components/ui/GlassButton'
 
@@ -14,6 +15,7 @@ interface CorrectionModalProps {
 }
 
 export function CorrectionModal({ label, currentValue, entityType, patientId, callId, onClose, onSaved }: CorrectionModalProps) {
+  const t = useTranslations('dashboard')
   const [newValue, setNewValue] = useState(currentValue)
   const [saving, setSaving] = useState(false)
 
@@ -30,15 +32,15 @@ export function CorrectionModal({ label, currentValue, entityType, patientId, ca
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <GlassCard className="w-full max-w-md">
-        <h3 className="mb-4 font-medium text-white">Correct {label}</h3>
+        <h3 className="mb-4 font-medium text-white">{t('correct')} {label}</h3>
         <input
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
           className="w-full rounded-xl border border-blue-500/20 bg-blue-950/30 px-4 py-2.5 text-white focus:outline-none focus:border-blue-500/50"
         />
         <div className="mt-4 flex justify-end gap-2">
-          <GlassButton variant="secondary" onClick={onClose}>Cancel</GlassButton>
-          <GlassButton variant="success" onClick={handleSave} disabled={saving || !newValue}>{saving ? 'Saving...' : 'Save'}</GlassButton>
+          <GlassButton variant="secondary" onClick={onClose}>{t('cancel')}</GlassButton>
+          <GlassButton variant="success" onClick={handleSave} disabled={saving || !newValue}>{saving ? t('saving') : t('save')}</GlassButton>
         </div>
       </GlassCard>
     </div>

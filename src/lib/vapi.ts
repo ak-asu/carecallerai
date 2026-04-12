@@ -54,16 +54,13 @@ export async function runCallPipeline(params: {
   let result: GroqExtractionResult
 
   if (!needsGroq) {
-    // Fast path: generate simple dialog response without full Groq NER
-    result = await extractAndRespond({
-      transcript,
-      agentType: callType === 'outbound' ? 'intake' : 'inbound',
-      language,
-      verifiedMeds: meds.map((m) => ({ drug_name_normalized: m.drug_name_normalized, dose: m.dose })),
-      supermemoryContext,
-      flaggedEntities: [],
-      contradiction: { detected: false },
-    })
+    // Fast path (Layer 1+2 only, ~200ms): return a simple acknowledgment
+    // without calling Groq. The agent continues the dialogue with a brief prompt.
+    const ackText = language === 'es'
+      ? 'Entendido. ¿Hay algo más que quiera comentarme hoy?'
+      : 'Got it. Is there anything else you would like to share with me today?'
+    await logDecision(callId, patientId, transcript, 'accepted', 'fast_path_high_confidence', entityConfidence)
+    return { responseText: ackText, action: 'accepted' }
   } else {
     // --- Layer 3: Groq reasoning ---
     const agentType = contradiction.detected
@@ -83,8 +80,7 @@ export async function runCallPipeline(params: {
     })
   }
 
-  // Suppress unused variable warning
-  void appointments
+  void appointments // used in context but not directly iterated
 
   await logDecision(callId, patientId, transcript, result.action, result.clarification_text ?? '', entityConfidence)
 

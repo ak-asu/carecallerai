@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { runCallPipeline } from '@/lib/vapi'
 
-export const runtime = 'edge'
-
 export async function POST(req: NextRequest) {
   const body = await req.json()
 

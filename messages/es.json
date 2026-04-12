@@ -14,6 +14,10 @@
     "emergency": "Si no se siente seguro, llame al 911 inmediatamente",
     "staffWillContact": "Un miembro del personal se pondrá en contacto pronto",
     "followUpScheduled": "Se ha programado un seguimiento",
+    "correct": "Corregir",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
     "source": {
       "stt_inferred": "inferido por sistema",
       "context_enriched": "coincidencia contextual",

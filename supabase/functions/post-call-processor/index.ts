@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
 
   // Gemini summary
   const genai = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY')!)
-  const model = genai.getGenerativeModel({ model: 'gemini-2.0-flash' })
+  const model = genai.getGenerativeModel({ model: 'gemini-2.5-flash' })
   const prompt = `Analyze this patient call transcript. Return JSON only:
 {"summary":"2-3 sentence clinical summary","severity":0-10,"symptoms":["list"],"medicationChanges":["list"],"followUpRequired":true/false}
 Transcript: "${call.transcript}"`

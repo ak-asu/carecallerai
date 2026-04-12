@@ -1,3 +1,4 @@
+'use client'
 import { useTranslations } from 'next-intl'
 import { EntityCard } from './EntityCard'
 import type { Medication, EntitySource } from '@/types'

@@ -1,6 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { HeroUIProvider } from '@heroui/react'
 
 export default async function LocaleLayout({
   children,
@@ -16,9 +15,7 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <HeroUIProvider>
-            {children}
-          </HeroUIProvider>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

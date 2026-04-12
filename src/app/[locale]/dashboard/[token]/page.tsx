@@ -8,6 +8,7 @@ import { CallSummarySection } from '@/components/dashboard/CallSummarySection'
 import { MedicationSection } from '@/components/dashboard/MedicationSection'
 import { AppointmentSection } from '@/components/dashboard/AppointmentSection'
 import { TimelineSection } from '@/components/dashboard/TimelineSection'
+import { SavingsCard } from '@/components/dashboard/SavingsCard'
 import { useRealtimeAlerts } from '@/hooks/useRealtimeAlerts'
 import { useTranslations } from 'next-intl'
 import type { Appointment, Escalation, Medication, TimelineEvent } from '@/types'
@@ -36,6 +37,11 @@ export default function DashboardPage() {
 
   const { patient, medications, appointments, timeline, lastCall } = data
 
+  // Extract savings_found events for SavingsCard rendering
+  const savingsEvents = timeline.filter((e) => e.event_type === 'savings_found') as Array<
+    TimelineEvent & { content: { drugName: string; links: { url: string; title: string }[] } }
+  >
+
   return (
     <div className="min-h-screen p-4 md:p-6 max-w-2xl mx-auto">
       {/* Header */}
@@ -55,6 +61,9 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-6">
         <CallSummarySection lastCall={lastCall} />
         <MedicationSection medications={medications} patientId={patient.id} locale={locale} />
+        {savingsEvents.map((e) => (
+          <SavingsCard key={e.id} drugName={e.content.drugName} links={e.content.links} />
+        ))}
         <AppointmentSection appointments={appointments} patientId={patient.id} />
         <TimelineSection events={timeline} />
       </div>

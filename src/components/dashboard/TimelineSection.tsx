@@ -1,3 +1,4 @@
+'use client'
 import { useTranslations } from 'next-intl'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { GlassBadge } from '@/components/ui/GlassBadge'

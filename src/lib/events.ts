@@ -17,7 +17,10 @@ export async function fireEvent(event: AutomationEvent): Promise<void> {
   // For immediate events, invoke the relevant Edge Function
   if (event.type === 'call.completed') {
     await invokeEdgeFunction('post-call-processor', event)
-  } else if (event.type === 'escalation.created') {
+  }
+  // escalation.created: logged to automation_jobs for async pickup by a clinician notification handler
+  // appointment.updated: triggers appointment-monitor to check and reschedule
+  if (event.type === 'appointment.updated') {
     await invokeEdgeFunction('appointment-monitor', event)
   }
 }

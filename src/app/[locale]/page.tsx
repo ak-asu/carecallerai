@@ -2,8 +2,8 @@ import { GlassCard } from '@/components/ui/GlassCard'
 import { GlassBadge } from '@/components/ui/GlassBadge'
 import Link from 'next/link'
 
-export default function LandingPage({ params }: { params: { locale: string } }) {
-  const { locale } = params
+export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
 
   const features = [
     { icon: '📞', title: 'Proactive Check-ins', desc: 'Outbound calls for symptom collection and adherence tracking' },
