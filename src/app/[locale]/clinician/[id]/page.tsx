@@ -1,3 +1,5 @@
+import type { Call, Escalation, Patient, TimelineEvent } from "@/types";
+
 import { supabaseAdmin } from "@/lib/supabase";
 import { TimelineFeed } from "@/components/clinician/TimelineFeed";
 import { EscalationCard } from "@/components/clinician/EscalationCard";
@@ -34,7 +36,10 @@ export default async function ClinicianPage({
     ],
   );
 
-  const patient = patientRes.data;
+  const patient = patientRes.data as Patient | null;
+  const timeline = timelineRes.data as TimelineEvent[] | null;
+  const escalations = escalationsRes.data as Escalation[] | null;
+  const calls = callsRes.data as Call[] | null;
 
   if (!patient)
     return <div className="p-8 text-white/50">Patient not found</div>;
@@ -53,13 +58,13 @@ export default async function ClinicianPage({
         </p>
       </div>
 
-      {(escalationsRes.data?.length ?? 0) > 0 && (
+      {(escalations?.length ?? 0) > 0 && (
         <section className="mb-6">
           <h2 className="mb-3 text-sm font-medium text-red-400 uppercase tracking-wider">
             Active Escalations
           </h2>
           <div className="flex flex-col gap-2">
-            {escalationsRes.data!.map((e) => (
+            {escalations!.map((e) => (
               <EscalationCard key={e.id} escalation={e} />
             ))}
           </div>
@@ -70,7 +75,7 @@ export default async function ClinicianPage({
         <h2 className="mb-3 text-sm font-medium text-white/50 uppercase tracking-wider">
           Patient Timeline
         </h2>
-        <TimelineFeed events={timelineRes.data ?? []} />
+        <TimelineFeed events={timeline ?? []} />
       </section>
 
       <section>
@@ -78,7 +83,7 @@ export default async function ClinicianPage({
           Recent Calls
         </h2>
         <div className="flex flex-col gap-4">
-          {(callsRes.data ?? []).map((call) => (
+          {(calls ?? []).map((call) => (
             <CallTranscriptView
               key={call.id}
               summary={call.summary ?? ""}

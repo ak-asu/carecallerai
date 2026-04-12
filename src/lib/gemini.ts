@@ -5,7 +5,7 @@ const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export async function summarizeCall(
   transcript: string,
-  language: string,
+  _language: string,
 ): Promise<{
   summary: string;
   severity: number;

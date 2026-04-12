@@ -73,9 +73,17 @@ export async function runCallPipeline(params: {
     .eq("call_id", callId)
     .single();
 
-  const meds: Medication[] = session?.context?.meds ?? [];
-  const appointments: Appointment[] = session?.context?.appointments ?? [];
-  const supermemoryContext: string = session?.context?.memory ?? "";
+  const sessionContext = session?.context as
+    | {
+        memory?: string;
+        meds?: Medication[];
+        appointments?: Appointment[];
+      }
+    | undefined;
+
+  const meds: Medication[] = sessionContext?.meds ?? [];
+  const appointments: Appointment[] = sessionContext?.appointments ?? [];
+  const supermemoryContext: string = sessionContext?.memory ?? "";
 
   // Contradiction check
   const contradiction = detectContradiction(transcript, meds);

@@ -78,6 +78,8 @@ export async function processEndOfCallWebhook(
 
   if (!call) return;
 
+  if (!call.patient_id) return;
+
   await supabaseAdmin
     .from("calls")
     .update({

@@ -1,4 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
+
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const publishable =
@@ -14,7 +16,9 @@ if (!publishable) {
 // Browser client (respects RLS)
 export const supabaseBrowser = createClient(url, publishable);
 
-let adminClient: ReturnType<typeof createClient> | null = null;
+type AppSupabaseClient = SupabaseClient<Database>;
+
+let adminClient: AppSupabaseClient | null = null;
 
 function getSupabaseAdminClient() {
   if (typeof window !== "undefined") {
@@ -33,7 +37,7 @@ function getSupabaseAdminClient() {
   }
 
   if (!adminClient) {
-    adminClient = createClient(url, secret, {
+    adminClient = createClient<Database>(url, secret, {
       auth: { persistSession: false },
     });
   }
@@ -42,7 +46,7 @@ function getSupabaseAdminClient() {
 }
 
 // Server/admin client (bypasses RLS) — lazily initialized so browser bundles don't evaluate server env checks.
-export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
+export const supabaseAdmin = new Proxy({} as AppSupabaseClient, {
   get(_target, prop, _receiver) {
     const client = getSupabaseAdminClient();
     const value = Reflect.get(client as unknown as object, prop);
