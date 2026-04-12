@@ -192,15 +192,27 @@ function detectContradiction(
 }
 
 async function logDecision(
-  callId: string,
+  vapiCallId: string,
   patientId: string,
   transcript: string,
   action: string,
   rationale: string,
   confidence: number,
 ): Promise<void> {
+  // call_entities.call_id references calls.id (DB UUID), not the VAPI call ID string
+  const { data: callRow } = await supabaseAdmin
+    .from("calls")
+    .select("id")
+    .eq("vapi_call_id", vapiCallId)
+    .single();
+
+  if (!callRow?.id || !patientId) {
+    // No matching call or patient yet — skip to avoid FK violation
+    return;
+  }
+
   await supabaseAdmin.from("call_entities").insert({
-    call_id: callId,
+    call_id: callRow.id,
     patient_id: patientId,
     entity_type: "utterance",
     value_raw: transcript,

@@ -15,13 +15,24 @@ export async function processCallStartedWebhook(
   const callId = getVapiCallId(body);
   const patientPhone = getVapiPatientPhone(body);
 
-  if (!callId || !patientPhone) return;
+  console.log("[webhook] call-started callId:", callId, "phone:", patientPhone);
 
-  const { data: patient } = await supabaseAdmin
+  if (!callId || !patientPhone) {
+    console.warn("[webhook] missing callId or phone — aborting");
+    return;
+  }
+
+  const { data: patient, error: patientErr } = await supabaseAdmin
     .from("patients")
     .select("id, language")
     .eq("phone", patientPhone)
     .single();
+
+  console.log(
+    "[webhook] patient lookup:",
+    patient?.id ?? "NOT FOUND",
+    patientErr?.message ?? "",
+  );
 
   if (!patient) return;
 
