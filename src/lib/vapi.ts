@@ -153,6 +153,7 @@ export async function runCallPipeline(params: {
 
   const responseText =
     result.response_text?.trim() ||
+    result.clarification_text?.trim() ||
     (language === "es"
       ? "Lo siento, ¿puede repetir eso? Quiero asegurarme de entenderle bien."
       : "I'm sorry, could you say that again? I want to make sure I understand you correctly.");

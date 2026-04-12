@@ -128,6 +128,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ assistant: buildAssistantConfig() });
     }
 
+    case "assistant.started":
     case "call-started":
       await processCallStartedWebhook(body);
 
@@ -136,6 +137,15 @@ export async function POST(req: NextRequest) {
     case "call-ended":
     case "end-of-call-report":
       await processEndOfCallWebhook(body);
+
+      return NextResponse.json({ ok: true });
+
+    case "status-update":
+      // Backup: VAPI skips end-of-call-report on abrupt endings (silence-timed-out, errors).
+      // Handle status=ended here so post-call processing always runs.
+      if (body.message?.status === "ended") {
+        await processEndOfCallWebhook(body);
+      }
 
       return NextResponse.json({ ok: true });
 
