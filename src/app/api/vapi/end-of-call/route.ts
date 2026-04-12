@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getVapiCallId, parseAndVerifyVapiRequest } from "@/lib/vapi-signature";
 import { processEndOfCallWebhook } from "@/lib/vapi-webhook";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   const parsed = await parseAndVerifyVapiRequest(req);
 

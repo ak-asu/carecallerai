@@ -4,13 +4,13 @@ import {
   getVapiMessageType,
   parseAndVerifyVapiRequest,
 } from "@/lib/vapi-signature";
-
-export const dynamic = "force-dynamic";
 import {
   buildUnsupportedToolResults,
   processCallStartedWebhook,
   processEndOfCallWebhook,
 } from "@/lib/vapi-webhook";
+
+export const dynamic = "force-dynamic";
 
 // Top 50 drug names for AssemblyAI wordBoost — improves transcription accuracy
 // for the brand/generic names most commonly mentioned in patient calls
