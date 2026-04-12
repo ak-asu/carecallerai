@@ -28,6 +28,7 @@ export async function extractAndRespond(params: {
     heard?: string;
     record?: string;
   };
+  numericAmbiguity?: boolean;
 }): Promise<GroqExtractionResult> {
   const {
     transcript,
@@ -37,6 +38,7 @@ export async function extractAndRespond(params: {
     supermemoryContext,
     flaggedEntities,
     contradiction,
+    numericAmbiguity = false,
   } = params;
 
   const systemPrompt = AGENT_PROMPTS[agentType](language);
@@ -49,6 +51,7 @@ Patient's verified medications: ${medsContext || "none on file"}
 Prior context from memory: ${supermemoryContext || "none"}
 ${contradiction.detected ? `CONTRADICTION DETECTED: Patient said "${contradiction.heard}" but record shows "${contradiction.record}" for ${contradiction.field}` : ""}
 ${flaggedEntities.length ? `LOW CONFIDENCE ENTITIES needing clarification: ${flaggedEntities.join(", ")}` : ""}
+${numericAmbiguity ? `NUMERIC AMBIGUITY DETECTED: A dose or quantity was heard that is acoustically similar to two possible values (e.g. fifteen vs fifty). Ask the patient to confirm the exact number.` : ""}
 
 Patient's latest utterance: "${transcript}"
 

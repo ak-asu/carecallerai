@@ -10,6 +10,52 @@ import {
   processEndOfCallWebhook,
 } from "@/lib/vapi-webhook";
 
+// Top 50 drug names for AssemblyAI wordBoost — improves transcription accuracy
+// for the brand/generic names most commonly mentioned in patient calls
+const WORD_BOOST = [
+  "warfarin", "coumadin", "lisinopril", "metformin", "glucophage",
+  "atorvastatin", "lipitor", "amlodipine", "norvasc", "sertraline",
+  "zoloft", "gabapentin", "neurontin", "omeprazole", "prilosec",
+  "furosemide", "lasix", "escitalopram", "lexapro", "metoprolol",
+  "lopressor", "losartan", "cozaar", "levothyroxine", "synthroid",
+  "albuterol", "ventolin", "prednisone", "fluticasone", "flonase",
+  "montelukast", "singulair", "pantoprazole", "protonix", "rosuvastatin",
+  "crestor", "simvastatin", "zocor", "clopidogrel", "plavix",
+  "hydrochlorothiazide", "spironolactone", "aldactone", "carvedilol",
+  "coreg", "valsartan", "diovan", "enalapril", "ramipril", "semaglutide",
+  "ozempic", "wegovy", "jardiance", "farxiga", "lantus", "humalog",
+  "prozac", "cymbalta", "wellbutrin", "klonopin", "ativan", "xanax",
+];
+
+function buildAssistantConfig() {
+  const sttProvider = process.env.STT_PROVIDER?.trim() ?? "assembly-ai";
+  const customSttUrl = process.env.CUSTOM_STT_URL?.trim();
+
+  const transcriber =
+    sttProvider === "custom" && customSttUrl
+      ? {
+          provider: "custom-transcriber" as const,
+          server: { url: customSttUrl },
+        }
+      : {
+          provider: "assembly-ai" as const,
+          wordBoost: WORD_BOOST,
+          languageCode: "en",
+        };
+
+  return {
+    transcriber,
+    model: {
+      provider: "custom-llm" as const,
+      url: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/vapi/chat`,
+    },
+    voice: {
+      provider: "11labs" as const,
+      voiceId: process.env.ELEVENLABS_VOICE_ID ?? "21m00Tcm4TlvDq8ikWAM",
+    },
+  };
+}
+
 export async function POST(req: NextRequest) {
   const parsed = await parseAndVerifyVapiRequest(req);
 
@@ -25,27 +71,18 @@ export async function POST(req: NextRequest) {
 
   switch (messageType) {
     case "assistant-request": {
-      const assistantId = process.env.VAPI_ASSISTANT_ID?.trim();
-
-      if (!assistantId) {
-        return NextResponse.json(
-          { error: "Missing VAPI_ASSISTANT_ID for assistant-request events." },
-          { status: 500 },
-        );
-      }
-
-      return NextResponse.json({ assistantId });
+      // Return inline assistant config so we can control the transcriber
+      // dynamically via STT_PROVIDER env var — no Vapi dashboard change needed
+      return NextResponse.json({ assistant: buildAssistantConfig() });
     }
 
     case "call-started":
       await processCallStartedWebhook(body);
-
       return NextResponse.json({ ok: true });
 
     case "call-ended":
     case "end-of-call-report":
       await processEndOfCallWebhook(body);
-
       return NextResponse.json({ ok: true });
 
     case "tool-calls":

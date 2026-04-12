@@ -1,28 +1,17 @@
-// RxNorm-style drug dictionary (subset for demo — extend as needed)
-const DRUG_DICT: Record<string, string> = {
-  lexapro: "Lexapro",
-  escitalopram: "Escitalopram",
-  metoprolol: "Metoprolol",
-  lopressor: "Metoprolol",
-  lisinopril: "Lisinopril",
-  zestril: "Lisinopril",
-  warfarin: "Warfarin",
-  coumadin: "Warfarin",
-  amlodipine: "Amlodipine",
-  norvasc: "Amlodipine",
-  lasix: "Furosemide",
-  furosemide: "Furosemide",
-  metformin: "Metformin",
-  glucophage: "Metformin",
-  atorvastatin: "Atorvastatin",
-  lipitor: "Atorvastatin",
-  omeprazole: "Omeprazole",
-  prilosec: "Omeprazole",
-  sertraline: "Sertraline",
-  zoloft: "Sertraline",
-  gabapentin: "Gabapentin",
-  neurontin: "Gabapentin",
-};
+import { DoubleMetaphone, LevenshteinDistance } from "natural";
+
+import DRUG_DICT_RAW from "./data/rxnorm-drugs.json";
+
+// Expanded RxNorm drug dictionary — ~200 generic + brand names
+const DRUG_DICT: Record<string, string> = DRUG_DICT_RAW as Record<string, string>;
+
+// Pre-compute phonetic encodings for all dict keys (done once at module load)
+const DRUG_PHONETICS: Array<[string, string, string]> = Object.keys(DRUG_DICT).map(
+  (key) => {
+    const [primary] = new DoubleMetaphone().process(key);
+    return [key, primary ?? "", DRUG_DICT[key]];
+  }
+);
 
 const TEXT_NUMBERS: Record<string, string> = {
   one: "1",
@@ -35,12 +24,23 @@ const TEXT_NUMBERS: Record<string, string> = {
   eight: "8",
   nine: "9",
   ten: "10",
+  eleven: "11",
+  twelve: "12",
+  thirteen: "13",
   fifteen: "15",
+  sixteen: "16",
+  seventeen: "17",
+  eighteen: "18",
+  nineteen: "19",
   twenty: "20",
   twentyfive: "25",
   thirty: "30",
   forty: "40",
   fifty: "50",
+  sixty: "60",
+  seventy: "70",
+  eighty: "80",
+  ninety: "90",
   hundred: "100",
 };
 
@@ -94,15 +94,24 @@ const NEGATION_PATTERNS = [
   /\bno\s+(chest|pain|breath|symptom)/i,
 ];
 
+// Acoustically confusable dose/count pairs at 8kHz telephony.
+// Both members of each pair are flagged — the downstream context layer resolves.
+const NUMERIC_AMBIGUOUS_PATTERNS: Array<[RegExp, string]> = [
+  [/\b(fifteen|fifty)\s*(mg|mcg|units?|ml|milligrams?|micrograms?|tablets?)\b/gi, "NUMERIC_AMBIGUOUS"],
+  [/\b(fourteen|forty)\s*(mg|mcg|units?|ml|milligrams?|micrograms?|tablets?)\b/gi, "NUMERIC_AMBIGUOUS"],
+  [/\b(nineteen|ninety)\s*(mg|mcg|units?|ml|milligrams?|micrograms?|tablets?)\b/gi, "NUMERIC_AMBIGUOUS"],
+  [/\b(eighteen|eighty)\s*(mg|mcg|units?|ml|milligrams?|micrograms?|tablets?)\b/gi, "NUMERIC_AMBIGUOUS"],
+  [/\b(thirteen|thirty)\s*(mg|mcg|units?|ml|milligrams?|micrograms?|tablets?)\b/gi, "NUMERIC_AMBIGUOUS"],
+  [/\b(sixteen|sixty)\s*(mg|mcg|units?|ml|milligrams?|micrograms?|tablets?)\b/gi, "NUMERIC_AMBIGUOUS"],
+];
+
 export function normalizeDose(text: string): string {
   let result = text.toLowerCase();
 
-  // Replace text numbers
   for (const [word, num] of Object.entries(TEXT_NUMBERS)) {
     result = result.replace(new RegExp(`\\b${word}\\b`, "gi"), num);
   }
 
-  // Normalize units
   result = result
     .replace(/milligrams?/gi, "mg")
     .replace(/micrograms?/gi, "mcg")
@@ -110,7 +119,6 @@ export function normalizeDose(text: string): string {
     .replace(/units?/gi, "units")
     .replace(/(\d)\s*mg/gi, "$1 mg");
 
-  // Normalize frequency
   for (const [phrase, abbr] of Object.entries(FREQUENCY_MAP)) {
     result = result.replace(new RegExp(phrase, "gi"), abbr);
   }
@@ -124,7 +132,6 @@ export function isNegated(text: string): boolean {
 
 export function isSafetyCandidate(text: string): boolean {
   const lower = text.toLowerCase();
-
   return SAFETY_TERMS.some((term) => lower.includes(term));
 }
 
@@ -142,7 +149,38 @@ export function extractDrugCandidates(text: string): string[] {
 }
 
 export function normalizeDrugName(raw: string): string {
-  return DRUG_DICT[raw.toLowerCase()] ?? raw;
+  const lower = raw.toLowerCase().trim();
+
+  // Stage 1: exact dict lookup
+  if (DRUG_DICT[lower]) return DRUG_DICT[lower];
+
+  // Stage 2: phonetic match (DoubleMetaphone)
+  const [rawPrimary] = new DoubleMetaphone().process(lower);
+  if (rawPrimary) {
+    for (const [_key, keyPrimary, normalized] of DRUG_PHONETICS) {
+      if (keyPrimary && rawPrimary === keyPrimary) return normalized;
+    }
+  }
+
+  // Stage 3: Levenshtein distance <= 2 (catches minor transcription errors)
+  for (const [key, , normalized] of DRUG_PHONETICS) {
+    if (LevenshteinDistance(lower, key) <= 2) return normalized;
+  }
+
+  return raw;
+}
+
+/**
+ * Flag acoustically ambiguous numeric dose quantities.
+ * Replaces the numeric word with NUMERIC_AMBIGUOUS token.
+ * These always route to Layer 3 for context-based resolution.
+ */
+export function flagNumericAmbiguity(text: string): string {
+  let result = text;
+  for (const [pattern, replacement] of NUMERIC_AMBIGUOUS_PATTERNS) {
+    result = result.replace(pattern, (_match, _numWord, unit) => `${replacement} ${unit}`);
+  }
+  return result;
 }
 
 // Confidence: average of word STT confidences, boosted if drug found in dict

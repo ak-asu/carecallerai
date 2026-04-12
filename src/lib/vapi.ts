@@ -6,6 +6,7 @@ import {
   extractDrugCandidates,
   normalizeDose,
   computeConfidence,
+  flagNumericAmbiguity,
 } from "./nlp";
 import { extractAndRespond } from "./groq";
 import { supabaseAdmin } from "./supabase";
@@ -34,8 +35,8 @@ export async function runCallPipeline(params: {
   const isSafety = isSafetyCandidate(transcript);
   const negated = isNegated(transcript);
   const drugCandidates = extractDrugCandidates(transcript);
-
-  normalizeDose(transcript);
+  const normalizedTranscript = normalizeDose(transcript);
+  const hasNumericAmbiguity = flagNumericAmbiguity(normalizedTranscript).includes("NUMERIC_AMBIGUOUS");
   const entityConfidence = computeConfidence(
     wordConfidences,
     drugCandidates.length > 0,
@@ -92,7 +93,8 @@ export async function runCallPipeline(params: {
   const needsGroq =
     entityConfidence < CONFIDENCE_THRESHOLD ||
     contradiction.detected ||
-    drugCandidates.length > 0;
+    drugCandidates.length > 0 ||
+    hasNumericAmbiguity;
 
   let result: GroqExtractionResult;
 
@@ -133,6 +135,7 @@ export async function runCallPipeline(params: {
       supermemoryContext,
       flaggedEntities: drugCandidates,
       contradiction,
+      numericAmbiguity: hasNumericAmbiguity,
     });
   }
 
