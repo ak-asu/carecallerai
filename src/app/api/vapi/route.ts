@@ -99,7 +99,7 @@ function buildAssistantConfig() {
     transcriber,
     model: {
       provider: "custom-llm" as const,
-      url: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/vapi/chat`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/vapi/llm`,
     },
     voice: {
       provider: "11labs" as const,

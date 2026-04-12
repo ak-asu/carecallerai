@@ -10,7 +10,7 @@ Phone call → Vapi telephony
        ├─ call-ended/report  → processEndOfCallWebhook()  → fires call.completed event
        └─ tool-calls         → buildUnsupportedToolResults()
 
-  └─ custom LLM: /api/vapi/chat → runCallPipeline()
+  └─ custom LLM: /api/vapi/llm → runCallPipeline()
        ├─ Layer 1: NLP rules (~5ms)
        │    ├─ isSafetyCandidate() + isNegated()  → immediate escalation if safety + not negated
        │    ├─ extractDrugCandidates()             → RxNorm dict + phonetic + Levenshtein
@@ -55,9 +55,9 @@ The current Vapi dashboard system prompt describes **"Riley" from Wellness Partn
 
 ### Why the System Prompt Still Matters
 
-Your `buildAssistantConfig()` in `/api/vapi/route.ts` returns the assistant config **inline** via `assistant-request`. This overrides the transcriber, model, and voice from the Vapi dashboard. However, Vapi **still uses the dashboard system prompt** when constructing the turn context passed to your custom LLM at `/api/vapi/chat`. It appears in the `messages` array as the first `system` role message.
+Your `buildAssistantConfig()` in `/api/vapi/route.ts` returns the assistant config **inline** via `assistant-request`. This overrides the transcriber, model, and voice from the Vapi dashboard. However, Vapi **still uses the dashboard system prompt** when constructing the turn context passed to your custom LLM at `/api/vapi/llm`. It appears in the `messages` array as the first `system` role message.
 
-Your `/api/vapi/chat` code reads only the last user message (`messages.reverse().find(m => m.role === 'user')`), so it doesn't directly use the Vapi system prompt — but it is included in Vapi's own turn-taking and interruption logic. Having a wrong system prompt causes Vapi to misinterpret the conversation context.
+Your `/api/vapi/llm` code reads only the last user message (`messages.reverse().find(m => m.role === 'user')`), so it doesn't directly use the Vapi system prompt — but it is included in Vapi's own turn-taking and interruption logic. Having a wrong system prompt causes Vapi to misinterpret the conversation context.
 
 ### Recommended System Prompt — Replace the Entire Current Content
 
@@ -238,7 +238,7 @@ Enable Realtime for these tables in Supabase Dashboard → Database → Replicat
 | **Assistant Type** | Phone |
 | **First Message** | `Hello, this is CareCaller. How are you feeling today?` |
 | **System Prompt** | Replace with the CareCaller prompt from Part 1 above |
-| **Model** | Custom LLM → URL: `https://your-app.vercel.app/api/vapi/chat` |
+| **Model** | Custom LLM → URL: `https://your-app.vercel.app/api/vapi/llm` |
 | **Transcriber** | Leave blank — returned dynamically via `assistant-request` webhook |
 | **Voice** | Leave blank — returned dynamically via `assistant-request` webhook |
 | **Silence Timeout** | 30 seconds |
@@ -426,7 +426,7 @@ Vapi (telephony audio stream)
   └─ returns { provider: "custom-transcriber", server: { url: CUSTOM_STT_URL } }
   └─ Vapi streams audio → Modal endpoint
   └─ Modal returns { transcript, words: [{word, start, end, confidence}], model }
-  └─ /api/vapi/chat receives transcript + word confidences
+  └─ /api/vapi/llm receives transcript + word confidences
   └─ wordConfidences extracted from body.call.transcript.words[].confidence
   └─ runCallPipeline() uses confidence scores in computeConfidence()
 ```
@@ -800,7 +800,7 @@ VAPI
 □ Phone number assigned to assistant
 □ Background denoising enabled
 □ Recording and transcripts enabled
-□ Model set to Custom LLM: https://your-app.vercel.app/api/vapi/chat
+□ Model set to Custom LLM: https://your-app.vercel.app/api/vapi/llm
 
 STT - ASSEMBLY AI
 □ STT_PROVIDER=assembly-ai set in Vercel
@@ -852,7 +852,7 @@ DURING EACH TEST CALL
 
 **Cron jobs do not fire on localhost.** `util.invoke_edge_function` calls your Supabase project URL — it works in any environment. To simulate cron during a local demo, use `SELECT util.invoke_edge_function(...)` directly in the SQL editor.
 
-**The Vapi system prompt and custom LLM coexist.** Vapi uses the system prompt for its own turn management and interruption logic. Your `/api/vapi/chat` custom LLM generates all spoken content. Both must be aligned to the same identity and behavior.
+**The Vapi system prompt and custom LLM coexist.** Vapi uses the system prompt for its own turn management and interruption logic. Your `/api/vapi/llm` custom LLM generates all spoken content. Both must be aligned to the same identity and behavior.
 
 **Modal cold start.** With `container_idle_timeout=300`, the Modal container stays warm for 5 minutes after the last request. First call after a cold start may take 8–15 seconds to load the model. Subsequent calls within 5 minutes are fast (~500ms transcription). Do a warm-up call before the demo.
 
