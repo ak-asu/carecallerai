@@ -62,6 +62,8 @@ export async function POST(req: NextRequest) {
       patientId: patient?.id ?? "",
       language: patient?.language ?? "en",
       callType: "inbound",
+      // Pass full conversation so Groq has context for each turn
+      messages,
       wordConfidences:
         body.call?.transcript?.words?.map(
           (w: { confidence: number }) => w.confidence,

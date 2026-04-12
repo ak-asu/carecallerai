@@ -105,6 +105,12 @@ function buildAssistantConfig() {
       provider: "11labs" as const,
       voiceId: process.env.ELEVENLABS_VOICE_ID ?? "21m00Tcm4TlvDq8ikWAM",
     },
+    // Smart endpointing: wait for a natural pause before sending to LLM.
+    // Prevents the LLM from firing on every partial speech segment.
+    smartEndpointingEnabled: true,
+    smartEndpointingPlan: {
+      provider: "vapi" as const,
+    },
   };
 }
 

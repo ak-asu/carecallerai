@@ -20,6 +20,7 @@ export async function runCallPipeline(params: {
   patientId: string;
   language: string;
   callType: "inbound" | "outbound";
+  messages?: Array<{ role: string; content: string }>;
   wordConfidences?: number[];
 }): Promise<{ responseText: string; action: string }> {
   const {
@@ -28,6 +29,7 @@ export async function runCallPipeline(params: {
     patientId,
     language,
     callType,
+    messages = [],
     wordConfidences = [],
   } = params;
 
@@ -137,6 +139,7 @@ export async function runCallPipeline(params: {
       flaggedEntities: drugCandidates,
       contradiction,
       numericAmbiguity: hasNumericAmbiguity,
+      conversationHistory: messages,
     });
   }
 
