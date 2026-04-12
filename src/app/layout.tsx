@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "./globals.css";
 
 // Root layout — locale-specific layout lives in app/[locale]/layout.tsx
 export default function RootLayout({
@@ -6,5 +6,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
 }

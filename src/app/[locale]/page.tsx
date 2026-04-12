@@ -100,9 +100,9 @@ export default async function LandingPage({
             "Layer 3: Groq",
             "→",
             "ElevenLabs TTS",
-          ].map((step) => (
+          ].map((step, index) => (
             <span
-              key={step}
+              key={`${step}-${index}`}
               className={
                 step === "→"
                   ? "text-blue-500"
