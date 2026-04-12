@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "title": "Your Care Summary",
+    "lastCall": "From your last call",
+    "medications": "Your Medications",
+    "appointments": "Upcoming Appointments",
+    "alerts": "Important Alerts",
+    "timeline": "Recent Activity",
+    "confirm": "Confirm",
+    "fix": "Fix",
+    "noData": "No data yet",
+    "loading": "Loading...",
+    "savings": "Cost savings info",
+    "emergency": "If you feel unsafe, call 911 immediately",
+    "staffWillContact": "A staff member will contact you soon",
+    "followUpScheduled": "A follow-up has been scheduled",
+    "source": {
+      "stt_inferred": "system inferred",
+      "context_enriched": "context matched",
+      "patient_verified": "you confirmed",
+      "clinician_verified": "doctor verified"
+    }
+  },
+  "pin": {
+    "title": "Enter your PIN to continue",
+    "placeholder": "PIN",
+    "submit": "Continue",
+    "error": "Incorrect PIN. Please try again."
+  },
+  "clinician": {
+    "title": "Patient Timeline",
+    "escalations": "Active Escalations",
+    "transcript": "Call Transcript"
+  }
+}

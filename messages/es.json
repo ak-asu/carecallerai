@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "title": "Tu Resumen de Atención",
+    "lastCall": "De tu última llamada",
+    "medications": "Tus Medicamentos",
+    "appointments": "Próximas Citas",
+    "alerts": "Alertas Importantes",
+    "timeline": "Actividad Reciente",
+    "confirm": "Confirmar",
+    "fix": "Corregir",
+    "noData": "Sin datos aún",
+    "loading": "Cargando...",
+    "savings": "Información de ahorro",
+    "emergency": "Si no se siente seguro, llame al 911 inmediatamente",
+    "staffWillContact": "Un miembro del personal se pondrá en contacto pronto",
+    "followUpScheduled": "Se ha programado un seguimiento",
+    "source": {
+      "stt_inferred": "inferido por sistema",
+      "context_enriched": "coincidencia contextual",
+      "patient_verified": "confirmado por ti",
+      "clinician_verified": "verificado por médico"
+    }
+  },
+  "pin": {
+    "title": "Ingresa tu PIN para continuar",
+    "placeholder": "PIN",
+    "submit": "Continuar",
+    "error": "PIN incorrecto. Inténtalo de nuevo."
+  },
+  "clinician": {
+    "title": "Historial del Paciente",
+    "escalations": "Escalaciones Activas",
+    "transcript": "Transcripción de Llamada"
+  }
+}
