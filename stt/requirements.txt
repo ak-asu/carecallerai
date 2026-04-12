@@ -1,0 +1,28 @@
+# Full training deps — install in Google Colab, not locally
+# (torch + transformers are large; install locally only if you have a GPU)
+#
+# Colab install:
+#   !pip install -r stt/requirements.txt
+
+# Core ML (Colab / GPU machine)
+torch>=2.1.0
+transformers>=4.40.0
+datasets>=2.19.0
+evaluate>=0.4.1
+accelerate>=0.29.0
+
+# Audio processing (pinned to locally verified versions)
+librosa==0.11.0
+soundfile==0.13.1
+scipy==1.17.1
+numpy==2.4.4
+
+# Synthetic audio generation
+edge-tts==7.2.8
+
+# Serving
+faster-whisper==1.2.1
+modal==1.4.1
+
+# Evaluation
+jiwer==4.0.0

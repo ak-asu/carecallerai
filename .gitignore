@@ -36,3 +36,13 @@ package-lock.json
 bun.lockb
 
 .env
+
+# Python
+stt/.venv/
+stt/__pycache__/
+stt/**/__pycache__/
+stt/**/*.pyc
+stt/data/synthetic_audio/
+stt/eval/test_sets/test_audio/
+stt/checkpoints/
+stt/results/

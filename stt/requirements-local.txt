@@ -1,0 +1,14 @@
+# Local development deps (no GPU needed)
+# Activate venv first:
+#   Windows: stt\.venv\Scripts\activate
+#   Unix:    source stt/.venv/bin/activate
+# Install: pip install -r stt/requirements-local.txt
+
+librosa==0.11.0
+soundfile==0.13.1
+scipy==1.17.1
+numpy==2.4.4
+edge-tts==7.2.8
+jiwer==4.0.0
+faster-whisper==1.2.1
+modal==1.4.1
