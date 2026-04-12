@@ -1,14 +1,17 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model = genai.getGenerativeModel({ model: 'gemini-2.5-flash' })
+const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-export async function summarizeCall(transcript: string, language: string): Promise<{
-  summary: string
-  severity: number
-  symptoms: string[]
-  medicationChanges: string[]
-  followUpRequired: boolean
+export async function summarizeCall(
+  transcript: string,
+  language: string,
+): Promise<{
+  summary: string;
+  severity: number;
+  symptoms: string[];
+  medicationChanges: string[];
+  followUpRequired: boolean;
 }> {
   const prompt = `You are a clinical documentation assistant. Analyze this patient call transcript and return ONLY valid JSON.
 
@@ -24,9 +27,13 @@ Return:
 }
 
 Severity scale: 0=no concerns, 5=moderate (follow up within 24h), 8=urgent (follow up within 4h), 10=emergency.
-Be conservative — only escalate severity if clearly warranted by the transcript.`
+Be conservative — only escalate severity if clearly warranted by the transcript.`;
 
-  const result = await model.generateContent(prompt)
-  const text = result.response.text().replace(/```json\n?|\n?```/g, '').trim()
-  return JSON.parse(text)
+  const result = await model.generateContent(prompt);
+  const text = result.response
+    .text()
+    .replace(/```json\n?|\n?```/g, "")
+    .trim();
+
+  return JSON.parse(text);
 }

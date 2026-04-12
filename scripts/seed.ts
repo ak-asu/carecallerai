@@ -4,9 +4,15 @@ import bcrypt from 'bcryptjs'
 import { createClient } from '@supabase/supabase-js'
 import 'dotenv/config'
 
+const supabaseServerKey = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseServerKey) {
+  throw new Error('Missing Supabase server key. Set SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY.')
+}
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  supabaseServerKey
 )
 
 const hash = await bcrypt.hash('1234', 10)

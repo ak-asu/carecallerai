@@ -1,31 +1,45 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { supabaseBrowser } from '@/lib/supabase'
-import type { Appointment } from '@/types'
+"use client";
+import type { Appointment } from "@/types";
 
-export function useRealtimeAppointment(patientId: string, initial: Appointment[]) {
-  const [appointments, setAppointments] = useState<Appointment[]>(initial)
+import { useEffect, useState } from "react";
+
+import { supabaseBrowser } from "@/lib/supabase";
+
+export function useRealtimeAppointment(
+  patientId: string,
+  initial: Appointment[],
+) {
+  const [appointments, setAppointments] = useState<Appointment[]>(initial);
 
   useEffect(() => {
-    if (!patientId) return
+    if (!patientId) return;
     const channel = supabaseBrowser
       .channel(`appointments:${patientId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'appointments',
-        filter: `patient_id=eq.${patientId}`,
-      }, (payload) => {
-        setAppointments((prev) => {
-          const updated = payload.new as Appointment
-          const exists = prev.find((a) => a.id === updated.id)
-          return exists ? prev.map((a) => a.id === updated.id ? updated : a) : [...prev, updated]
-        })
-      })
-      .subscribe()
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "appointments",
+          filter: `patient_id=eq.${patientId}`,
+        },
+        (payload) => {
+          setAppointments((prev) => {
+            const updated = payload.new as Appointment;
+            const exists = prev.find((a) => a.id === updated.id);
 
-    return () => { supabaseBrowser.removeChannel(channel) }
-  }, [patientId])
+            return exists
+              ? prev.map((a) => (a.id === updated.id ? updated : a))
+              : [...prev, updated];
+          });
+        },
+      )
+      .subscribe();
 
-  return appointments
+    return () => {
+      supabaseBrowser.removeChannel(channel);
+    };
+  }, [patientId]);
+
+  return appointments;
 }

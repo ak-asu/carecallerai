@@ -1,35 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
-import { fireEvent } from '@/lib/events'
+import { NextRequest, NextResponse } from "next/server";
+
+import { getVapiCallId, parseAndVerifyVapiRequest } from "@/lib/vapi-signature";
+import { processEndOfCallWebhook } from "@/lib/vapi-webhook";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const callId: string = body.message?.call?.id ?? body.call?.id
-  const transcript: string = body.message?.artifact?.transcript ?? ''
+  const parsed = await parseAndVerifyVapiRequest(req);
 
-  if (!callId) return NextResponse.json({ ok: false }, { status: 400 })
+  if (!parsed.ok) {
+    return NextResponse.json(
+      { ok: false, error: parsed.error },
+      { status: parsed.status },
+    );
+  }
 
-  // Get call record
-  const { data: call } = await supabaseAdmin
-    .from('calls')
-    .select('id, patient_id')
-    .eq('vapi_call_id', callId)
-    .single()
+  const callId = getVapiCallId(parsed.body);
 
-  if (!call) return NextResponse.json({ ok: true })
+  if (!callId) {
+    return NextResponse.json(
+      { ok: false, error: "Missing call ID" },
+      { status: 400 },
+    );
+  }
 
-  // Update call status + store transcript
-  await supabaseAdmin.from('calls').update({
-    status: 'completed',
-    transcript,
-    ended_at: new Date().toISOString(),
-  }).eq('vapi_call_id', callId)
+  await processEndOfCallWebhook(parsed.body);
 
-  // Clean up session cache
-  await supabaseAdmin.from('call_sessions').delete().eq('call_id', callId)
-
-  // Fire post-call processing
-  await fireEvent({ type: 'call.completed', callId: call.id, patientId: call.patient_id })
-
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true });
 }
