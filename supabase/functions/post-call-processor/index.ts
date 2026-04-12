@@ -38,11 +38,19 @@ interface ExtractedEntity {
   negated: boolean;
 }
 
+interface AppointmentRequest {
+  detected: boolean;
+  doctorName?: string;
+  requestedTimeframe?: string; // e.g. "next week", "tomorrow", "June"
+  reason?: string;
+}
+
 interface PostCallAnalysis {
   summary: string;
   severity: number;
   entities: ExtractedEntity[];
   followUpRequired: boolean;
+  appointmentRequest?: AppointmentRequest;
 }
 
 function clampSeverity(input: unknown): number {
@@ -183,7 +191,13 @@ Return this exact structure:
       "negated": false
     }
   ],
-  "followUpRequired": false
+  "followUpRequired": false,
+  "appointmentRequest": {
+    "detected": false,
+    "doctorName": "",
+    "requestedTimeframe": "",
+    "reason": ""
+  }
 }
 
 Entity types:
@@ -196,6 +210,7 @@ Entity types:
 Severity: 0=no concerns, 5=moderate (follow up 24h), 8=urgent (4h), 10=emergency.
 Negated=true means the patient explicitly denied this entity ("no chest pain").
 Confidence: your confidence that the entity was correctly transcribed (0.0-1.0).
+appointmentRequest.detected=true if the patient asked to book, schedule, or request an appointment.
 NEVER invent entities not present in the transcript.`;
 
   const result = await model.generateContent(prompt);
@@ -338,6 +353,75 @@ NEVER invent entities not present in the transcript.`;
       severity,
       status: "pending",
     });
+  }
+
+  // Appointment creation — if patient requested a booking during the call
+  const apptReq = parsed.appointmentRequest;
+
+  if (apptReq?.detected) {
+    // Resolve doctor by name (fuzzy — look for any part of the name)
+    let doctorId: string | null = null;
+
+    if (apptReq.doctorName) {
+      const namePart = apptReq.doctorName.replace(/^Dr\.?\s*/i, "").trim();
+      const { data: doctors } = await supabase
+        .from("doctors")
+        .select("id, name")
+        .ilike("name", `%${namePart}%`)
+        .limit(1);
+
+      doctorId = doctors?.[0]?.id ?? null;
+    }
+
+    // Convert loose timeframe to an ISO datetime.
+    // Default: 7 days out at 10:00 AM if no better hint.
+    const baseDate = new Date();
+    const timeframe = (apptReq.requestedTimeframe ?? "").toLowerCase();
+    let daysOut = 7;
+
+    if (/tomorrow/.test(timeframe)) daysOut = 1;
+    else if (/this week|within.*week/.test(timeframe)) daysOut = 3;
+    else if (/two weeks|2 weeks/.test(timeframe)) daysOut = 14;
+    else if (/month/.test(timeframe)) daysOut = 30;
+
+    baseDate.setDate(baseDate.getDate() + daysOut);
+    baseDate.setHours(10, 0, 0, 0);
+    const apptDatetime = baseDate.toISOString();
+
+    const { data: newAppt } = await supabase
+      .from("appointments")
+      .insert({
+        patient_id: patientId,
+        doctor_id: doctorId,
+        datetime: apptDatetime,
+        status: "scheduled",
+        reschedule_reason: null,
+        conflict_detected: false,
+      })
+      .select("id")
+      .single();
+
+    if (newAppt?.id) {
+      await supabase.from("patient_timeline").insert({
+        patient_id: patientId,
+        event_type: "appointment",
+        content: {
+          action: "scheduled",
+          appointmentId: newAppt.id,
+          doctorName: apptReq.doctorName ?? "unknown",
+          requestedTimeframe: apptReq.requestedTimeframe,
+          reason: apptReq.reason,
+          datetime: apptDatetime,
+        },
+        severity: 1,
+        source: "stt_inferred",
+      });
+
+      // Fire appointment-monitor to check for conflicts
+      await supabase.functions.invoke("appointment-monitor", {
+        body: { appointmentId: newAppt.id, patientId },
+      });
+    }
   }
 
   return new Response("ok");
