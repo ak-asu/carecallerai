@@ -10,6 +10,7 @@ interface EscalationEvent {
   patientId?: string;
   callId?: string;
   severity?: number;
+  jobId?: string | null;
 }
 
 Deno.serve(async (req) => {
@@ -95,6 +96,13 @@ Deno.serve(async (req) => {
     flagged: true,
     source: "stt_inferred",
   });
+
+  if (payload.jobId) {
+    await supabase
+      .from("automation_jobs")
+      .update({ status: "completed", completed_at: new Date().toISOString(), result: { ok: true } })
+      .eq("id", payload.jobId);
+  }
 
   return new Response(
     JSON.stringify({

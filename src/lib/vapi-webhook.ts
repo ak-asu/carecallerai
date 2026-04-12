@@ -15,13 +15,35 @@ export async function processCallStartedWebhook(
   const callId = getVapiCallId(body);
   const patientPhone = getVapiPatientPhone(body);
 
-  if (!callId || !patientPhone) return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawBody = body as any;
+  console.log(
+    "[webhook] call-started callId:", callId,
+    "phone:", patientPhone,
+    "raw_msg_call_customer:", rawBody?.message?.call?.customer?.number,
+    "raw_msg_customer:", rawBody?.message?.customer?.number,
+    "raw_call_customer:", rawBody?.call?.customer?.number,
+  );
 
-  const { data: patient } = await supabaseAdmin
+  if (!callId || !patientPhone) {
+    console.warn("[webhook] missing callId or phone — aborting");
+    return;
+  }
+
+  const { data: patientRows, error: patientErr } = await supabaseAdmin
     .from("patients")
     .select("id, language")
     .eq("phone", patientPhone)
-    .single();
+    .limit(1);
+
+  const patient = patientRows?.[0] ?? null;
+
+  console.log(
+    "[webhook] patient lookup:",
+    patient?.id ?? "NOT FOUND",
+    "rows:", patientRows?.length ?? 0,
+    patientErr?.message ?? "",
+  );
 
   if (!patient) return;
 
@@ -39,17 +61,21 @@ export async function processCallStartedWebhook(
       .eq("status", "scheduled"),
   ]);
 
-  await supabaseAdmin.from("call_sessions").upsert({
-    call_id: callId,
-    patient_id: patient.id,
-    context: {
-      memory: memory ?? "",
-      meds: medsRes.data ?? [],
-      appointments: apptsRes.data ?? [],
-    },
-  });
+  const { error: sessionErr } = await supabaseAdmin
+    .from("call_sessions")
+    .upsert({
+      call_id: callId,
+      patient_id: patient.id,
+      context: {
+        memory: memory ?? "",
+        meds: medsRes.data ?? [],
+        appointments: apptsRes.data ?? [],
+      },
+    });
 
-  await supabaseAdmin.from("calls").upsert(
+  console.log("[webhook] call_sessions upsert:", sessionErr?.message ?? "ok");
+
+  const { error: callErr } = await supabaseAdmin.from("calls").upsert(
     {
       patient_id: patient.id,
       vapi_call_id: callId,
@@ -60,6 +86,8 @@ export async function processCallStartedWebhook(
     },
     { onConflict: "vapi_call_id" },
   );
+
+  console.log("[webhook] calls upsert:", callErr?.message ?? "ok");
 }
 
 export async function processEndOfCallWebhook(
@@ -68,19 +96,28 @@ export async function processEndOfCallWebhook(
   const callId = getVapiCallId(body);
   const transcript = getVapiTranscript(body);
 
+  console.log("[webhook] end-of-call callId:", callId, "transcript length:", transcript.length);
+
   if (!callId) return;
 
-  const { data: call } = await supabaseAdmin
+  // Use limit(1) instead of .single() so a missing row doesn't throw
+  const { data: callRows, error: callLookupErr } = await supabaseAdmin
     .from("calls")
     .select("id, patient_id")
     .eq("vapi_call_id", callId)
-    .single();
+    .limit(1);
 
-  if (!call) return;
+  const call = callRows?.[0] ?? null;
 
-  if (!call.patient_id) return;
+  console.log(
+    "[webhook] call lookup:",
+    call?.id ?? "NOT FOUND",
+    callLookupErr?.message ?? "",
+  );
 
-  await supabaseAdmin
+  if (!call?.id || !call.patient_id) return;
+
+  const { error: updateErr } = await supabaseAdmin
     .from("calls")
     .update({
       status: "completed",
@@ -89,6 +126,8 @@ export async function processEndOfCallWebhook(
     })
     .eq("vapi_call_id", callId);
 
+  console.log("[webhook] calls update:", updateErr?.message ?? "ok");
+
   await supabaseAdmin.from("call_sessions").delete().eq("call_id", callId);
 
   await fireEvent({
@@ -96,6 +135,8 @@ export async function processEndOfCallWebhook(
     callId: call.id,
     patientId: call.patient_id,
   });
+
+  console.log("[webhook] call.completed fired for callId:", call.id);
 }
 
 export function buildUnsupportedToolResults(

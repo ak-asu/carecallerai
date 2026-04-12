@@ -20,6 +20,7 @@ export async function runCallPipeline(params: {
   patientId: string;
   language: string;
   callType: "inbound" | "outbound";
+  messages?: Array<{ role: string; content: string }>;
   wordConfidences?: number[];
 }): Promise<{ responseText: string; action: string }> {
   const {
@@ -28,6 +29,7 @@ export async function runCallPipeline(params: {
     patientId,
     language,
     callType,
+    messages = [],
     wordConfidences = [],
   } = params;
 
@@ -137,6 +139,7 @@ export async function runCallPipeline(params: {
       flaggedEntities: drugCandidates,
       contradiction,
       numericAmbiguity: hasNumericAmbiguity,
+      conversationHistory: messages,
     });
   }
 
@@ -153,6 +156,7 @@ export async function runCallPipeline(params: {
 
   const responseText =
     result.response_text?.trim() ||
+    result.clarification_text?.trim() ||
     (language === "es"
       ? "Lo siento, ¿puede repetir eso? Quiero asegurarme de entenderle bien."
       : "I'm sorry, could you say that again? I want to make sure I understand you correctly.");
@@ -191,15 +195,27 @@ function detectContradiction(
 }
 
 async function logDecision(
-  callId: string,
+  vapiCallId: string,
   patientId: string,
   transcript: string,
   action: string,
   rationale: string,
   confidence: number,
 ): Promise<void> {
+  // call_entities.call_id references calls.id (DB UUID), not the VAPI call ID string
+  const { data: callRow } = await supabaseAdmin
+    .from("calls")
+    .select("id")
+    .eq("vapi_call_id", vapiCallId)
+    .single();
+
+  if (!callRow?.id || !patientId) {
+    // No matching call or patient yet — skip to avoid FK violation
+    return;
+  }
+
   await supabaseAdmin.from("call_entities").insert({
-    call_id: callId,
+    call_id: callRow.id,
     patient_id: patientId,
     entity_type: "utterance",
     value_raw: transcript,
