@@ -41,7 +41,23 @@ export async function queryMemory(
       limit: 5,
     });
 
-    return (res.results ?? []).map((r) => r.content ?? "").join("\n");
+    return (res.results ?? [])
+      .map((r) => {
+        if (r.content) {
+          return r.content;
+        }
+
+        if (Array.isArray(r.chunks)) {
+          return r.chunks
+            .map((chunk) => chunk.content ?? "")
+            .filter(Boolean)
+            .join("\n");
+        }
+
+        return "";
+      })
+      .filter(Boolean)
+      .join("\n");
   } catch {
     return "";
   }
