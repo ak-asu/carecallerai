@@ -1,7 +1,5 @@
 import type { NextRequest } from "next/server";
 
-import { createHmac } from "node:crypto";
-
 interface VapiCall {
   id?: string;
   customer?: {
@@ -38,78 +36,23 @@ type ParsedWebhookResult =
   | { ok: true; body: VapiWebhookBody }
   | { ok: false; status: number; error: string };
 
-const SIGNATURE_HEADERS = ["x-vapi-signature", "x-webhook-signature"] as const;
-
-function getSignatureHeader(headers: Headers): string {
-  for (const header of SIGNATURE_HEADERS) {
-    const value = headers.get(header);
-
-    if (value?.trim()) return value.trim();
-  }
-
-  return "";
-}
-
-function timingSafeCompare(left: string, right: string): boolean {
-  if (left.length !== right.length) return false;
-
+// Vapi sends the raw secret as a plain value in the X-Vapi-Secret header.
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
   let mismatch = 0;
-
-  for (let i = 0; i < left.length; i += 1) {
-    mismatch |= left.charCodeAt(i) ^ right.charCodeAt(i);
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
   }
-
   return mismatch === 0;
 }
 
-function parseSignatureCandidates(signatureHeader: string): string[] {
-  const rawParts = signatureHeader
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  const candidates = new Set<string>();
-
-  for (const part of rawParts) {
-    if (part.startsWith("sha256=")) {
-      candidates.add(part.slice("sha256=".length).trim());
-      continue;
-    }
-
-    if (part.includes("=")) {
-      const [, ...rest] = part.split("=");
-      const value = rest.join("=").trim();
-
-      if (value) candidates.add(value);
-      continue;
-    }
-
-    candidates.add(part);
-  }
-
-  return Array.from(candidates);
-}
-
 export function verifyVapiSignature(
-  rawBody: string,
-  signatureHeader: string,
+  _rawBody: string,
+  headers: Headers,
   secret: string,
 ): boolean {
-  if (!signatureHeader || !secret) return false;
-
-  const expectedHex = createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
-  const expectedBase64 = createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("base64");
-  const candidates = parseSignatureCandidates(signatureHeader);
-
-  return candidates.some(
-    (candidate) =>
-      timingSafeCompare(candidate, expectedHex) ||
-      timingSafeCompare(candidate, expectedBase64),
-  );
+  const incoming = headers.get("x-vapi-secret")?.trim() ?? "";
+  return timingSafeEqual(incoming, secret);
 }
 
 export async function parseAndVerifyVapiRequest(
@@ -124,9 +67,7 @@ export async function parseAndVerifyVapiRequest(
   const secret = process.env.VAPI_WEBHOOK_SECRET?.trim();
 
   if (secret) {
-    const signature = getSignatureHeader(req.headers);
-
-    if (!signature || !verifyVapiSignature(rawBody, signature, secret)) {
+    if (!verifyVapiSignature(rawBody, req.headers, secret)) {
       return { ok: false, status: 401, error: "Invalid webhook signature" };
     }
   }
