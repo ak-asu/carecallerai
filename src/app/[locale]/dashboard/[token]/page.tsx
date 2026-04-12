@@ -104,7 +104,9 @@ export default function DashboardPage() {
           appointments={appointments}
           patientId={patient.id}
         />
-        <TimelineSection events={timeline} />
+        <TimelineSection
+          events={timeline.filter((e) => e.event_type !== "savings_found")}
+        />
       </div>
     </div>
   );
