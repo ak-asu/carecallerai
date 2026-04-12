@@ -11,13 +11,13 @@ interface GlassButtonProps {
 
 const variants = {
   primary:
-    "border-transparent bg-[#1387d7] text-white shadow-[0_18px_32px_rgba(19,135,215,0.24)] hover:bg-[#0e79c1]",
+    "border-transparent bg-[#2F6DB3] text-white shadow-[0_18px_32px_rgba(47,109,179,0.24)] hover:bg-[#22558C]",
   secondary:
-    "border-slate-200 bg-white/86 text-slate-700 hover:border-slate-300 hover:bg-white",
+    "border-[#D8CCBD] bg-[#FFFDF9]/92 text-slate-700 hover:border-[#C8B5A1] hover:bg-[#FFF7F0]",
   danger:
-    "border-red-200 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100",
+    "border-[#E9BDC3] bg-[#FBEAEC] text-[#B04858] hover:border-[#DBA2AB] hover:bg-[#F8DEE2]",
   success:
-    "border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300 hover:bg-emerald-100",
+    "border-[#C4D9C8] bg-[#E7F1EA] text-[#4F7761] hover:border-[#AFCBB5] hover:bg-[#DDEBE1]",
 };
 
 export function GlassButton({

@@ -105,6 +105,7 @@
     "nextTouchpoint": "Próximo punto de contacto",
     "currentSymptoms": "Síntomas activos",
     "noSymptoms": "No hay síntomas activos registrados.",
+    "noMeds": "No hay medicamentos activos registrados.",
     "careTeam": "Equipo de atención",
     "noCareTeam": "Todavía no hay médicos asociados.",
     "corrections": "Correcciones del paciente",
@@ -146,6 +147,7 @@
     "pendingEscalations": "{count, plural, one {# escalación pendiente} other {# escalaciones pendientes}}",
     "noActiveEscalation": "Sin escalación activa",
     "latestPatientMessage": "Último mensaje del paciente: {date}",
+    "savingsUpdated": "Actualizado {date} con Tavily",
     "costSupport": "Apoyo de costos",
     "costSupportEmpty": "Los programas de ahorro aparecerán aquí cuando la línea de tiempo registre opciones de ayuda para medicamentos activos.",
     "emergencyHotline": "Llama al 911 ahora"

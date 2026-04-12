@@ -7,12 +7,12 @@ interface GlassBadgeProps {
 }
 
 const colors = {
-  blue: "border-sky-200 bg-sky-50 text-sky-700",
-  emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  amber: "border-amber-200 bg-amber-50 text-amber-700",
-  red: "border-red-200 bg-red-50 text-red-700",
-  purple: "border-violet-200 bg-violet-50 text-violet-700",
-  cyan: "border-cyan-200 bg-cyan-50 text-cyan-700",
+  blue: "border-[#BFD2E9] bg-[#EEF4FB] text-[#2F6DB3]",
+  emerald: "border-[#C4D9C8] bg-[#E7F1EA] text-[#5F8B73]",
+  amber: "border-[#E9D2B2] bg-[#F8EDD8] text-[#B9772E]",
+  red: "border-[#E9BDC3] bg-[#FBEAEC] text-[#C84C5E]",
+  purple: "border-[#D8CBE3] bg-[#F3EDF8] text-[#7A5D96]",
+  cyan: "border-[#CFE1E3] bg-[#EAF3F4] text-[#4C7F86]",
 };
 
 export function GlassBadge({

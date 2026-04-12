@@ -1,7 +1,11 @@
+import type { Language } from "@/types";
+
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
 import { getAppointmentRecommendations } from "@/lib/doctorSchedule";
+import { getMedicationSavingsForPatient } from "@/lib/medicationSavings";
+import { derivePatientSeverity } from "@/lib/patientSeverity";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(
@@ -84,22 +88,40 @@ export async function POST(
   ]);
 
   const patientMessages = messagesRes.data ?? [];
-  const appointmentRecommendations = await getAppointmentRecommendations(
-    symptomsRes.data ?? [],
-  );
+  const medications = medsRes.data ?? [];
+  const symptoms = symptomsRes.data ?? [];
+  const escalations = escalationsRes.data ?? [];
+  const derivedSeverity = derivePatientSeverity({
+    storedSeverity: patient.severity_score,
+    symptoms,
+    escalations,
+  });
+  const [appointmentRecommendations, liveSavings] = await Promise.all([
+    getAppointmentRecommendations(symptoms),
+    getMedicationSavingsForPatient({
+      patient: {
+        id: patient.id,
+        name_alias: patient.name_alias,
+        language: patient.language as Language,
+      },
+      medications,
+      symptoms,
+    }),
+  ]);
 
   return NextResponse.json({
     patient: {
       id: patient.id,
       name_alias: patient.name_alias,
       language: patient.language,
-      severity_score: patient.severity_score,
+      severity_score: derivedSeverity,
     },
-    medications: medsRes.data ?? [],
+    medications,
     appointments: apptsRes.data ?? [],
     timeline: timelineRes.data ?? [],
-    escalations: escalationsRes.data ?? [],
-    symptoms: symptomsRes.data ?? [],
+    escalations,
+    symptoms,
+    liveSavings,
     messages: {
       totalCount: patientMessages.length,
       pendingCount: patientMessages.filter(

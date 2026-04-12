@@ -4,6 +4,7 @@ import type {
   AppointmentWithDoctor,
   DoctorRecommendation,
   Escalation,
+  MedicationSavings,
   Medication,
   Symptom,
   TimelineEvent,
@@ -44,6 +45,7 @@ interface DashboardData {
     pendingCount: number;
     latestAt: string | null;
   };
+  liveSavings: MedicationSavings[];
   lastCall: {
     summary: string;
     severity_score: number;
@@ -98,6 +100,52 @@ function formatDateTime(
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function dedupeSavingsEntries(entries: MedicationSavings[]): MedicationSavings[] {
+  const grouped = new Map<string, MedicationSavings>();
+
+  for (const entry of entries) {
+    const key = entry.drugName.trim().toLowerCase();
+    const existing = grouped.get(key);
+
+    if (!existing) {
+      grouped.set(key, {
+        ...entry,
+        links: Array.from(
+          new Map(entry.links.map((link) => [link.url, link])).values(),
+        ),
+      });
+      continue;
+    }
+
+    const mergedLinks = Array.from(
+      new Map(
+        [...existing.links, ...entry.links].map((link) => [link.url, link]),
+      ).values(),
+    );
+    const nextFetchedAt =
+      existing.fetchedAt && entry.fetchedAt
+        ? new Date(existing.fetchedAt) > new Date(entry.fetchedAt)
+          ? existing.fetchedAt
+          : entry.fetchedAt
+        : existing.fetchedAt ?? entry.fetchedAt;
+
+    grouped.set(key, {
+      ...existing,
+      medicationId: existing.medicationId ?? entry.medicationId,
+      contextSummary: existing.contextSummary ?? entry.contextSummary,
+      query: existing.query ?? entry.query,
+      links: mergedLinks,
+      fetchedAt: nextFetchedAt,
+      source:
+        existing.source === "tavily" || entry.source === "tavily"
+          ? "tavily"
+          : existing.source,
+    });
+  }
+
+  return Array.from(grouped.values());
 }
 
 export default function DashboardPage() {
@@ -162,9 +210,22 @@ export default function DashboardPage() {
     (event) => event.event_type === "savings_found",
   ) as Array<
     TimelineEvent & {
-      content: { drugName: string; links: { url: string; title: string }[] };
+      content: {
+        drugName: string;
+        links: { url: string; title: string }[];
+      };
     }
   >;
+  const savingsData = dedupeSavingsEntries(
+    data.liveSavings.length > 0
+      ? data.liveSavings
+      : savingsEvents.map((event) => ({
+          drugName: event.content.drugName,
+          links: event.content.links,
+          fetchedAt: null,
+          source: "timeline" as const,
+        })),
+  );
   const correctionCount = timeline.filter(
     (event) => event.event_type === "correction",
   ).length;
@@ -229,7 +290,7 @@ export default function DashboardPage() {
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
           <aside className="space-y-6">
             <GlassCard className="surface-card-dark rounded-[2rem]">
-              <p className="eyebrow mb-3 text-cyan-300">{t("profileCard")}</p>
+              <p className="eyebrow mb-3 text-[#BDD8CC]">{t("profileCard")}</p>
               <h2 className="text-3xl font-semibold text-white">
                 {patient.name_alias}
               </h2>
@@ -246,7 +307,7 @@ export default function DashboardPage() {
 
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#C8DED4]">
                     {t("medicationConfidence")}
                   </p>
                   <p className="mt-3 text-3xl font-semibold text-white">
@@ -257,7 +318,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#C8DED4]">
                     {t("corrections")}
                   </p>
                   <p className="mt-3 text-3xl font-semibold text-white">
@@ -270,7 +331,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#C8DED4]">
                   {t("messageSummary")}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-slate-200/88">
@@ -399,11 +460,8 @@ export default function DashboardPage() {
 
               <div className="grid gap-6">
                 <CallSummarySection lastCall={lastCall} />
-                {savingsEvents[0] ? (
-                  <SavingsCard
-                    drugName={savingsEvents[0].content.drugName}
-                    links={savingsEvents[0].content.links}
-                  />
+                {savingsData.length > 0 ? (
+                  <SavingsCard savings={savingsData} />
                 ) : (
                   <GlassCard className="rounded-[2rem]">
                     <p className="eyebrow mb-3">{t("costSupport")}</p>

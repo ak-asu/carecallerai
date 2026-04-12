@@ -105,6 +105,7 @@
     "nextTouchpoint": "Next touchpoint",
     "currentSymptoms": "Active symptoms",
     "noSymptoms": "No active symptoms are currently logged.",
+    "noMeds": "No active medications are currently recorded.",
     "careTeam": "Care team",
     "noCareTeam": "No associated doctors yet.",
     "corrections": "Patient corrections",
@@ -146,6 +147,7 @@
     "pendingEscalations": "{count, plural, one {# pending escalation} other {# pending escalations}}",
     "noActiveEscalation": "No active escalation",
     "latestPatientMessage": "Latest patient message: {date}",
+    "savingsUpdated": "Updated {date} via Tavily",
     "costSupport": "Cost support",
     "costSupportEmpty": "Savings programs will appear here when the timeline records assistance options for active medications.",
     "emergencyHotline": "Call 911 now"

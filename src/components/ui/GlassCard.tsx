@@ -11,7 +11,8 @@ export function GlassCard({ children, className, glow }: GlassCardProps) {
     <div
       className={clsx(
         "surface-card rounded-[2rem] p-5 md:p-6 transition-all duration-300",
-        glow && "shadow-[0_28px_80px_rgba(38,133,255,0.16)] border-sky-200/70",
+        glow &&
+          "shadow-[0_28px_80px_rgba(197,107,66,0.14)] border-[#E3B9A6]/70",
         className,
       )}
     >

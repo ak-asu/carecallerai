@@ -425,6 +425,63 @@ export type Database = {
           },
         ];
       };
+      medication_savings: {
+        Row: {
+          context_summary: string | null;
+          created_at: string;
+          drug_name: string;
+          fetched_at: string;
+          id: string;
+          links: Json;
+          medication_id: string | null;
+          patient_id: string;
+          source: string;
+          tavily_query: string;
+          updated_at: string;
+        };
+        Insert: {
+          context_summary?: string | null;
+          created_at?: string;
+          drug_name: string;
+          fetched_at?: string;
+          id?: string;
+          links?: Json;
+          medication_id?: string | null;
+          patient_id: string;
+          source?: string;
+          tavily_query: string;
+          updated_at?: string;
+        };
+        Update: {
+          context_summary?: string | null;
+          created_at?: string;
+          drug_name?: string;
+          fetched_at?: string;
+          id?: string;
+          links?: Json;
+          medication_id?: string | null;
+          patient_id?: string;
+          source?: string;
+          tavily_query?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "medication_savings_medication_id_fkey";
+            columns: ["medication_id"];
+            isOneToOne: false;
+            referencedRelation: "medications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "medication_savings_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       notifications: {
         Row: {
           created_at: string | null;

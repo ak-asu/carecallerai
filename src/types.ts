@@ -50,6 +50,23 @@ export interface Medication {
   verified_at: string | null;
 }
 
+export interface SavingsLink {
+  title: string;
+  url: string;
+  summary?: string | null;
+  source?: string | null;
+}
+
+export interface MedicationSavings {
+  medicationId?: string | null;
+  drugName: string;
+  contextSummary?: string | null;
+  query?: string | null;
+  links: SavingsLink[];
+  fetchedAt: string | null;
+  source: "tavily" | "timeline" | "stored";
+}
+
 export interface Appointment {
   id: string;
   patient_id: string;

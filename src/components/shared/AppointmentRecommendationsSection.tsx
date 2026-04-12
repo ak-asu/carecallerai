@@ -23,6 +23,15 @@ function formatSlotLabel(slot: RecommendedAppointmentSlot, locale: string) {
   }).format(new Date(slot.starts_at));
 }
 
+function formatNextAvailable(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
 export function AppointmentRecommendationsSection({
   patientId,
   recommendations: initialRecommendations,
@@ -143,13 +152,17 @@ export function AppointmentRecommendationsSection({
           {t("noRecommendations")}
         </p>
       ) : (
-        <div className="mt-6 grid gap-4 xl:grid-cols-2">
+        <div
+          className={`mt-6 grid gap-4 ${
+            mode === "clinician" ? "2xl:grid-cols-2" : "xl:grid-cols-2"
+          }`}
+        >
           {recommendations.map((recommendation) => (
             <div
               key={recommendation.schedule_id}
               className="rounded-[1.6rem] border border-slate-200/80 bg-white/78 p-5"
             >
-              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <p className="eyebrow mb-2">{recommendation.specialty}</p>
                   <h3 className="text-2xl font-semibold text-slate-900">
@@ -161,17 +174,17 @@ export function AppointmentRecommendationsSection({
                     })}
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <GlassBadge color="blue">{t("sortedByDistance")}</GlassBadge>
+                <div className="flex flex-wrap items-start gap-2 lg:max-w-[16rem] lg:justify-end">
+                  <GlassBadge className="whitespace-nowrap" color="blue">
+                    {t("sortedByDistance")}
+                  </GlassBadge>
                   {recommendation.next_available_at && (
-                    <GlassBadge color="emerald">
+                    <GlassBadge className="leading-6" color="emerald">
                       {t("nextAvailable")}:{" "}
-                      {new Intl.DateTimeFormat(locale, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      }).format(new Date(recommendation.next_available_at))}
+                      {formatNextAvailable(
+                        recommendation.next_available_at,
+                        locale,
+                      )}
                     </GlassBadge>
                   )}
                 </div>
@@ -199,17 +212,19 @@ export function AppointmentRecommendationsSection({
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   {t("availableSlots")}
                 </p>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-2 md:max-h-[7rem] md:overflow-y-auto md:pr-2">
                   {recommendation.slots.map((slot) => (
                     <GlassButton
                       key={slot.id}
-                      className="justify-between rounded-[1.2rem] px-4 py-3 text-left"
+                      className="flex min-h-24 w-full flex-col items-start rounded-[1.2rem] px-4 py-3 text-left"
                       disabled={bookingId === slot.id}
                       variant="secondary"
                       onClick={() => handleBook(recommendation, slot)}
                     >
-                      <span>{formatSlotLabel(slot, locale)}</span>
-                      <span className="ml-4 text-xs uppercase tracking-[0.16em] text-sky-700">
+                      <span className="text-base font-semibold leading-7 text-slate-800">
+                        {formatSlotLabel(slot, locale)}
+                      </span>
+                      <span className="mt-3 text-xs uppercase tracking-[0.16em] text-sky-700">
                         {bookingId === slot.id ? t("booking") : t("bookSlot")}
                       </span>
                     </GlassButton>

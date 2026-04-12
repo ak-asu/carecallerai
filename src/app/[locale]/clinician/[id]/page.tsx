@@ -12,6 +12,7 @@ import type {
 import { getTranslations } from "next-intl/server";
 
 import { getAppointmentRecommendations } from "@/lib/doctorSchedule";
+import { derivePatientSeverity } from "@/lib/patientSeverity";
 import { supabaseAdmin } from "@/lib/supabase";
 import { TimelineFeed } from "@/components/clinician/TimelineFeed";
 import { EscalationCard } from "@/components/clinician/EscalationCard";
@@ -45,16 +46,16 @@ function formatDateTime(
 }
 
 function recommendedAction(
-  patient: Patient,
+  severityScore: number,
   escalations: Escalation[],
   nextAppointment: AppointmentWithDoctor | null,
   t: (key: any) => string,
 ) {
-  if (escalations.length > 0 || patient.severity_score >= 8) {
+  if (escalations.length > 0 || severityScore >= 8) {
     return t("recommendedAction.urgent");
   }
 
-  if (patient.severity_score >= 5) {
+  if (severityScore >= 5) {
     return nextAppointment
       ? t("recommendedAction.midWithAppointment")
       : t("recommendedAction.midWithoutAppointment");
@@ -168,26 +169,34 @@ export default async function ClinicianPage({
     appointments.find((appointment) => appointment.status !== "cancelled") ??
     null;
   const latestCall = calls[0] ?? null;
+  const activeEscalations = escalations.filter(
+    (escalation) => escalation.status !== "resolved",
+  );
+  const derivedSeverity = derivePatientSeverity({
+    storedSeverity: patient.severity_score,
+    symptoms,
+    escalations: activeEscalations,
+  });
   const recommendations = await getAppointmentRecommendations(symptoms, {
     limitDoctors: 6,
   });
   const fallbackDate = tCommon("notYet");
   const nextAction = recommendedAction(
-    patient,
-    escalations,
+    derivedSeverity,
+    activeEscalations,
     nextAppointment,
     t,
   );
   const currentState =
-    patient.severity_score >= 7 || escalations.length > 0
+    derivedSeverity >= 7 || activeEscalations.length > 0
       ? t("state.needsAttention")
-      : patient.severity_score >= 4
+      : derivedSeverity >= 4
         ? t("state.moderateWatch")
         : t("state.stableHomeMonitoring");
 
   return (
     <div className="page-shell">
-      <div className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto flex min-h-screen max-w-[1680px] flex-col gap-6 px-4 py-6 md:px-6 lg:px-8 lg:py-8">
         <header className="flex flex-col gap-6 rounded-[2rem] border border-white/50 bg-white/55 px-6 py-6 shadow-soft backdrop-blur-xl md:px-8 md:py-7 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <p className="eyebrow mb-3">{t("eyebrow")}</p>
@@ -201,8 +210,8 @@ export default async function ClinicianPage({
 
           <div className="flex flex-col items-start gap-3 lg:items-end">
             <div className="flex flex-wrap items-center gap-2">
-              <GlassBadge color={severityColor(patient.severity_score)}>
-                {t("severityFormat", { score: patient.severity_score })}
+              <GlassBadge color={severityColor(derivedSeverity)}>
+                {t("severityFormat", { score: derivedSeverity })}
               </GlassBadge>
               <GlassBadge color="cyan">
                 {patient.language.toUpperCase()}
@@ -215,10 +224,10 @@ export default async function ClinicianPage({
           </div>
         </header>
 
-        <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_340px]">
+        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1.3fr)_320px] 2xl:grid-cols-[320px_minmax(0,1.45fr)_360px]">
           <aside className="space-y-6">
             <GlassCard className="surface-card-dark rounded-[2rem]">
-              <p className="eyebrow mb-3 text-cyan-300">{t("snapshot")}</p>
+              <p className="eyebrow mb-3 text-[#BDD8CC]">{t("snapshot")}</p>
               <h2 className="text-3xl font-semibold text-white">
                 {patient.name_alias}
               </h2>
@@ -236,7 +245,7 @@ export default async function ClinicianPage({
 
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#C8DED4]">
                     {t("messagesMetric")}
                   </p>
                   <p className="mt-2 text-3xl font-semibold text-white">
@@ -244,7 +253,7 @@ export default async function ClinicianPage({
                   </p>
                 </div>
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#C8DED4]">
                     {t("escalationsMetric")}
                   </p>
                   <p className="mt-2 text-3xl font-semibold text-white">

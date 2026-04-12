@@ -2,6 +2,14 @@ import Supermemory from "supermemory";
 
 let client: Supermemory | null = null;
 
+export interface PatientMemoryContext {
+  profileSummary: string;
+  affordabilitySummary: string;
+  adherenceSummary: string;
+  clinicalSummary: string;
+  combinedSummary: string;
+}
+
 function getSupermemoryClient() {
   const apiKey = process.env.SUPERMEMORY_API_KEY;
 
@@ -61,4 +69,79 @@ export async function queryMemory(
   } catch {
     return "";
   }
+}
+
+function normalizeMemoryText(text: string) {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function uniqueSentences(text: string, limit = 2) {
+  const seen = new Set<string>();
+
+  return text
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => normalizeMemoryText(sentence))
+    .filter(Boolean)
+    .filter((sentence) => {
+      const key = sentence.toLowerCase();
+
+      if (seen.has(key)) return false;
+      seen.add(key);
+
+      return true;
+    })
+    .slice(0, limit);
+}
+
+function compactMemorySection(text: string, limit = 2) {
+  return uniqueSentences(text, limit).join(" ");
+}
+
+export async function getPatientMemoryContext(
+  patientId: string,
+): Promise<PatientMemoryContext> {
+  const [
+    profileSummary,
+    affordabilitySummary,
+    adherenceSummary,
+    clinicalSummary,
+  ] = await Promise.all([
+    queryMemory(
+      patientId,
+      "patient profile chronic conditions demographics family support care goals",
+    ),
+    queryMemory(
+      patientId,
+      "medication affordability insurance copay coupons pharmacy cost barriers financial concerns",
+    ),
+    queryMemory(
+      patientId,
+      "medication adherence refill issues side effects missed doses patient preferences routines barriers",
+    ),
+    queryMemory(
+      patientId,
+      "recent symptoms timeline recent appointments recent care updates complications",
+    ),
+  ]);
+
+  const compactProfile = compactMemorySection(profileSummary);
+  const compactAffordability = compactMemorySection(affordabilitySummary);
+  const compactAdherence = compactMemorySection(adherenceSummary);
+  const compactClinical = compactMemorySection(clinicalSummary);
+  const combinedSummary = [
+    compactProfile,
+    compactAffordability,
+    compactAdherence,
+    compactClinical,
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  return {
+    profileSummary: compactProfile,
+    affordabilitySummary: compactAffordability,
+    adherenceSummary: compactAdherence,
+    clinicalSummary: compactClinical,
+    combinedSummary,
+  };
 }

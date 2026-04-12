@@ -18,7 +18,14 @@ export function MedicationSection({
 }: MedicationSectionProps) {
   const t = useTranslations("dashboard");
 
-  if (!medications.length) return null;
+  if (!medications.length) {
+    return (
+      <section>
+        <h2 className="eyebrow mb-4">{t("medications")}</h2>
+        <p className="text-sm leading-7 text-slate-600">{t("noMeds")}</p>
+      </section>
+    );
+  }
 
   return (
     <section>
