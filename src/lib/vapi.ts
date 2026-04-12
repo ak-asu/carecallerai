@@ -151,7 +151,13 @@ export async function runCallPipeline(params: {
     entityConfidence,
   );
 
-  return { responseText: result.response_text, action: result.action };
+  const responseText =
+    result.response_text?.trim() ||
+    (language === "es"
+      ? "Lo siento, ¿puede repetir eso? Quiero asegurarme de entenderle bien."
+      : "I'm sorry, could you say that again? I want to make sure I understand you correctly.");
+
+  return { responseText, action: result.action };
 }
 
 function detectContradiction(
