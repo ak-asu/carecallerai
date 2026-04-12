@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "font", sans-serif;
+  --font-mono: "monospace", monospace;
+  --color-navy-950: #050C1A;
+  --color-navy-900: #080F20;
+  --color-navy-800: #0D1730;
+  --color-brand: #3B82F6;
+  --color-brand-dark: #1D4ED8;
+  --color-teal: #06B6D4;
+}
+
+body {
+  background-color: #050C1A;
+  color: #F8FAFC;
+  font-family: var(--font-sans);
+}

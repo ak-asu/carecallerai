@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Read(//mnt/c/Users/presyze/Projects/ASU/**)",
+      "Bash(dir \"C:\\\\Users\\\\presyze\\\\Projects\\\\ASU\\\\carecallerai\")",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(timeout 15 pnpm dev)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
