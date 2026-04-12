@@ -17,6 +17,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .apt_install("libsndfile1", "ffmpeg")
     .pip_install(
+        "fastapi[standard]>=0.112.0",
         "faster-whisper==1.0.3",
         "numpy>=1.24.0",
         "librosa>=0.10.1",
@@ -33,15 +34,9 @@ MODEL_DIR = "/model"
     image=image,
     gpu="T4",
     volumes={MODEL_DIR: model_volume},
-    container_idle_timeout=300,  # keep warm for 5 min between calls
+    scaledown_window=300,  # keep warm for 5 min between calls
 )
 class WhisperSTT:
-
-    @modal.build()
-    def download_base_model(self):
-        """Download whisper-small at build time as fallback."""
-        from faster_whisper import WhisperModel
-        WhisperModel("small", download_root=f"{MODEL_DIR}/base", device="cpu")
 
     @modal.enter()
     def load_model(self):
@@ -58,7 +53,7 @@ class WhisperSTT:
             self.model = WhisperModel("small", device="cuda", compute_type="float16")
             self.model_name = "whisper-small-base"
 
-    @modal.web_endpoint(method="POST")
+    @modal.fastapi_endpoint(method="POST")
     def transcribe(self, request: dict) -> dict:
         """
         Request body:
