@@ -22,6 +22,7 @@ import { MedicationSection } from "@/components/dashboard/MedicationSection";
 import { AppointmentSection } from "@/components/dashboard/AppointmentSection";
 import { TimelineSection } from "@/components/dashboard/TimelineSection";
 import { SavingsCard } from "@/components/dashboard/SavingsCard";
+import { VoiceSummaryCard } from "@/components/dashboard/VoiceSummaryCard";
 import { MessageBox } from "@/components/dashboard/MessageBox";
 import { AppointmentRecommendationsSection } from "@/components/shared/AppointmentRecommendationsSection";
 import { useRealtimeAlerts } from "@/hooks/useRealtimeAlerts";
@@ -342,6 +343,8 @@ export default function DashboardPage() {
                 </p>
               </div>
             </GlassCard>
+
+            <VoiceSummaryCard locale={locale} token={token} />
 
             <GlassCard className="rounded-[2rem]">
               <p className="eyebrow mb-4">{t("currentSymptoms")}</p>

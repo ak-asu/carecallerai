@@ -1,12 +1,6 @@
-import type { Language } from "@/types";
-
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 
-import { getAppointmentRecommendations } from "@/lib/doctorSchedule";
-import { getMedicationSavingsForPatient } from "@/lib/medicationSavings";
-import { derivePatientSeverity } from "@/lib/patientSeverity";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getDashboardDataByToken } from "@/lib/dashboardData";
 
 export async function POST(
   req: NextRequest,
@@ -14,122 +8,14 @@ export async function POST(
 ) {
   const { token } = await params;
   const { pin } = await req.json();
+  const dashboardResult = await getDashboardDataByToken(token, String(pin ?? ""));
 
-  const { data: patient } = await supabaseAdmin
-    .from("patients")
-    .select("*")
-    .eq("token", token)
-    .single();
+  if (!dashboardResult.ok) {
+    return NextResponse.json(
+      { error: dashboardResult.error },
+      { status: dashboardResult.status },
+    );
+  }
 
-  if (!patient)
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
-
-  const valid = await bcrypt.compare(String(pin), patient.password_hash);
-
-  if (!valid)
-    return NextResponse.json({ error: "invalid_pin" }, { status: 401 });
-
-  // Fetch all dashboard data
-  const [
-    medsRes,
-    apptsRes,
-    timelineRes,
-    escalationsRes,
-    lastCallRes,
-    symptomsRes,
-    messagesRes,
-  ] = await Promise.all([
-    supabaseAdmin
-      .from("medications")
-      .select("*")
-      .eq("patient_id", patient.id)
-      .eq("active", true),
-    supabaseAdmin
-      .from("appointments")
-      .select("*, doctors(name, specialty)")
-      .eq("patient_id", patient.id)
-      .gte("datetime", new Date().toISOString())
-      .order("datetime")
-      .limit(3),
-    supabaseAdmin
-      .from("patient_timeline")
-      .select("*")
-      .eq("patient_id", patient.id)
-      .order("created_at", { ascending: false })
-      .limit(10),
-    supabaseAdmin
-      .from("escalations")
-      .select("*")
-      .eq("patient_id", patient.id)
-      .eq("status", "pending"),
-    supabaseAdmin
-      .from("calls")
-      .select("id, summary, severity_score, ended_at")
-      .eq("patient_id", patient.id)
-      .eq("status", "completed")
-      .order("ended_at", { ascending: false })
-      .limit(1),
-    supabaseAdmin
-      .from("symptoms")
-      .select(
-        "id, patient_id, call_id, symptom_name, severity, onset_date, resolved, flagged_to_clinician",
-      )
-      .eq("patient_id", patient.id)
-      .or("resolved.is.null,resolved.eq.false")
-      .order("severity", { ascending: false })
-      .limit(6),
-    supabaseAdmin
-      .from("notifications")
-      .select("id, created_at, status")
-      .eq("patient_id", patient.id)
-      .eq("type", "patient_message")
-      .order("created_at", { ascending: false })
-      .limit(10),
-  ]);
-
-  const patientMessages = messagesRes.data ?? [];
-  const medications = medsRes.data ?? [];
-  const symptoms = symptomsRes.data ?? [];
-  const escalations = escalationsRes.data ?? [];
-  const derivedSeverity = derivePatientSeverity({
-    storedSeverity: patient.severity_score,
-    symptoms,
-    escalations,
-  });
-  const [appointmentRecommendations, liveSavings] = await Promise.all([
-    getAppointmentRecommendations(symptoms),
-    getMedicationSavingsForPatient({
-      patient: {
-        id: patient.id,
-        name_alias: patient.name_alias,
-        language: patient.language as Language,
-      },
-      medications,
-      symptoms,
-    }),
-  ]);
-
-  return NextResponse.json({
-    patient: {
-      id: patient.id,
-      name_alias: patient.name_alias,
-      language: patient.language,
-      severity_score: derivedSeverity,
-    },
-    medications,
-    appointments: apptsRes.data ?? [],
-    timeline: timelineRes.data ?? [],
-    escalations,
-    symptoms,
-    liveSavings,
-    messages: {
-      totalCount: patientMessages.length,
-      pendingCount: patientMessages.filter(
-        (message) => message.status === "pending",
-      ).length,
-      latestAt: patientMessages[0]?.created_at ?? null,
-    },
-    lastCall: lastCallRes.data?.[0] ?? null,
-    recommendations: appointmentRecommendations,
-  });
+  return NextResponse.json(dashboardResult.data);
 }

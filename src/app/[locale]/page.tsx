@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
+import { HomeVoiceAgentCard } from "@/components/landing/HomeVoiceAgentCard";
 import { GlassBadge } from "@/components/ui/GlassBadge";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -122,6 +123,8 @@ export default async function LandingPage({
             </ul>
           </GlassCard>
         </section>
+
+        <HomeVoiceAgentCard locale={locale} />
       </div>
     </div>
   );

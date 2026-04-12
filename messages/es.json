@@ -57,6 +57,24 @@
       "patient": "La vista del paciente resalta el estado de monitoreo, los próximos pasos y acciones de autoservicio más seguras.",
       "clinician": "La vista clínica concentra el contexto asistencial en un diseño operativo más rápido.",
       "ui": "La interfaz compartida ahora usa superficies más suaves, mejor tipografía y mejor espaciado móvil."
+    },
+    "voiceAgent": {
+      "eyebrow": "Agente de voz en vivo",
+      "title": "Habla con CareCaller desde la pagina principal",
+      "description": "Abre una conversacion en vivo con ElevenLabs aqui mismo. Empieza en ingles o espanol y luego pide al agente que cambie de idioma mientras hablas.",
+      "english": "Ingles",
+      "spanish": "Espanol",
+      "hint": "Prueba diciendo: \"Switch to English\" o \"Cambia a espanol.\"",
+      "widgetLabel": "Panel de conversacion",
+      "loading": "Preparando el agente de voz...",
+      "error": "El agente de ElevenLabs todavia no esta listo. Agrega el ID de tu agente conversacional al entorno y vuelve a intentarlo.",
+      "retry": "Intentar de nuevo",
+      "actionText": "Hablar con CareCaller",
+      "startCallText": "Iniciar conversacion",
+      "endCallText": "Terminar conversacion",
+      "expandText": "Abrir agente de voz",
+      "listeningText": "Escuchando...",
+      "speakingText": "Hablando..."
     }
   },
   "dashboard": {
@@ -150,7 +168,20 @@
     "savingsUpdated": "Actualizado {date} con Tavily",
     "costSupport": "Apoyo de costos",
     "costSupportEmpty": "Los programas de ahorro aparecerán aquí cuando la línea de tiempo registre opciones de ayuda para medicamentos activos.",
-    "emergencyHotline": "Llama al 911 ahora"
+    "emergencyHotline": "Llama al 911 ahora",
+    "voiceSummary": {
+      "eyebrow": "Resumen por voz",
+      "title": "Escuchar el resumen del paciente",
+      "description": "Genera un resumen hablado y actualizado con el perfil, los medicamentos, los síntomas, las citas, los mensajes y el contexto reciente del paciente.",
+      "generate": "Reproducir resumen",
+      "refresh": "Actualizar resumen",
+      "loading": "Generando resumen...",
+      "textLabel": "Texto del resumen",
+      "audioLabel": "Reproduccion de audio",
+      "audioUnavailable": "El resumen escrito ya esta listo, pero el audio no esta disponible en este momento.",
+      "error": "No se pudo generar el resumen de atencion en este momento.",
+      "pinMissing": "El PIN del panel vencio. Recarga la pagina e inicia sesion otra vez."
+    }
   },
   "pin": {
     "title": "Ingresa tu PIN para continuar",

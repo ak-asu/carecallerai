@@ -57,6 +57,24 @@
       "patient": "Patient view emphasizes monitoring state, next steps, and safer self-service actions.",
       "clinician": "Clinician view condenses the care context into a faster operations layout.",
       "ui": "Shared UI now uses softer surfaces, stronger typography, and better mobile spacing."
+    },
+    "voiceAgent": {
+      "eyebrow": "Live voice agent",
+      "title": "Talk to CareCaller from the home page",
+      "description": "Open a live ElevenLabs conversation right here. Start in English or Spanish, then ask the agent to switch languages naturally while you talk.",
+      "english": "English",
+      "spanish": "Espanol",
+      "hint": "Try saying: \"Switch to English\" or \"Cambia a espanol.\"",
+      "widgetLabel": "Conversation panel",
+      "loading": "Preparing the voice agent...",
+      "error": "The ElevenLabs agent is not ready yet. Add your conversational agent ID to the environment and try again.",
+      "retry": "Try again",
+      "actionText": "Talk with CareCaller",
+      "startCallText": "Start conversation",
+      "endCallText": "End conversation",
+      "expandText": "Open voice agent",
+      "listeningText": "Listening...",
+      "speakingText": "Speaking..."
     }
   },
   "dashboard": {
@@ -150,7 +168,20 @@
     "savingsUpdated": "Updated {date} via Tavily",
     "costSupport": "Cost support",
     "costSupportEmpty": "Savings programs will appear here when the timeline records assistance options for active medications.",
-    "emergencyHotline": "Call 911 now"
+    "emergencyHotline": "Call 911 now",
+    "voiceSummary": {
+      "eyebrow": "Voice summary",
+      "title": "Listen to the patient summary",
+      "description": "Generate a fresh spoken recap from the latest profile, medications, symptoms, appointments, messages, and timeline-backed context.",
+      "generate": "Play care summary",
+      "refresh": "Refresh summary",
+      "loading": "Generating summary...",
+      "textLabel": "Summary text",
+      "audioLabel": "Audio playback",
+      "audioUnavailable": "The written summary is ready, but audio generation is unavailable right now.",
+      "error": "The care summary could not be generated right now.",
+      "pinMissing": "The dashboard PIN expired. Refresh the page and sign in again."
+    }
   },
   "pin": {
     "title": "Enter your PIN to continue",
