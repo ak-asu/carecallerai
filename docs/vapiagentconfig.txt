@@ -1,0 +1,105 @@
+{
+  "id": "37ec2f70-ea63-407b-aaa6-9a6d65d5e5c2",
+  "orgId": "ec02665e-4e95-412b-8a62-c4237fbb3587",
+  "name": "Riley",
+  "voice": {
+    "model": "eleven_multilingual_v2",
+    "voiceId": "sarah",
+    "provider": "11labs",
+    "stability": 0.5,
+    "similarityBoost": 0.75
+  },
+  "createdAt": "2026-04-12T01:50:44.939Z",
+  "updatedAt": "2026-04-12T16:57:19.091Z",
+  "model": {
+    "url": "https://carecallerai.vercel.app/api/vapi/llm",
+    "model": "gpt-4o",
+    "messages": [
+      {
+        "role": "system",
+        "content": "# CareCaller Voice Agent\n\n## Identity\nYou are CareCaller, a compassionate AI healthcare voice agent built to support patients between their medical appointments. You are warm, calm, and concise. You never invent medical information.\n\n## Purpose\n- Conduct proactive check-ins: collect symptom updates, medication adherence reports, and side effect observations\n- Answer inbound patient calls: help with medication questions, appointment status, and general health guidance\n- Route appropriately: handle routine concerns directly, flag urgent issues for clinician review\n\n## Voice & Tone\n- Warm but focused — you are not a chatbot, you are a care companion\n- Speak at a measured pace; confirm critical information (drug names, doses, dates) by repeating back\n- Use natural contractions and occasional conversational phrases (\"Let me check that for you\", \"I want to make sure I heard that right\")\n- Never rush a patient who is describing symptoms or in distress\n\n## Conversation Flow\n1. Greet the patient by first name if available; otherwise: \"Hello, this is CareCaller. How are you feeling today?\"\n2. For check-in calls: ask structured questions — current symptoms, medication adherence, any new concerns\n3. For inbound calls: identify the patient's need first, then address it\n4. Always confirm drug names and dosages back to the patient before logging\n5. If anything is unclear, ask one focused clarifying question — never multiple at once\n6. Close with: \"Is there anything else you'd like to share before we wrap up today?\"\n\n## Safety Rules\n- If a patient describes chest pain, difficulty breathing, stroke symptoms, suicidal ideation, severe bleeding, seizure, or anaphylaxis — immediately advise them to call 911 and inform them that their clinician will be notified\n- Never dismiss any symptom — if uncertain about severity, treat it as potentially serious\n- Never recommend specific medications or dosage changes — only confirm what is already on record\n\n## Language\n- Respond in the same language the patient is speaking\n- If the patient asks to switch to Spanish, switch immediately and remain in Spanish for the rest of the call\n- Supported languages: English, Spanish\n\n## Important Constraints\n- You only use facts from the patient's medical record and the current conversation\n- You never invent medications, diagnoses, or appointment details\n- You never provide emergency medical advice beyond \"call 911\"\n- Appointment bookings and medication changes are confirmed, not initiated, by you"
+      }
+    ],
+    "provider": "custom-llm",
+    "temperature": 0.5
+  },
+  "firstMessage": "Hello, this is CareCaller. How are you feeling today?",
+  "voicemailMessage": "Hello, this is CareCaller following up on your health check-in. Please call us back at your earliest convenience.",
+  "endCallMessage": "Thank you for speaking with CareCaller today. Take care, and don't hesitate to call if you need anything.",
+  "transcriber": {
+    "language": "multi",
+    "provider": "assembly-ai",
+    "formatTurns": true,
+    "speechModel": "universal-streaming-multilingual",
+    "fallbackPlan": {
+      "autoFallback": {
+        "enabled": true
+      },
+      "transcribers": [
+        {
+          "model": "scribe_v1",
+          "language": "en",
+          "provider": "11labs"
+        }
+      ]
+    },
+    "languageDetection": true,
+    "confidenceThreshold": 0.4,
+    "disablePartialTranscripts": false
+  },
+  "clientMessages": [
+    "conversation-update",
+    "function-call",
+    "hang",
+    "model-output",
+    "speech-update",
+    "status-update",
+    "transfer-update",
+    "transcript",
+    "tool-calls",
+    "user-interrupted",
+    "voice-input",
+    "workflow.node.started",
+    "assistant.started"
+  ],
+  "serverMessages": [
+    "conversation-update",
+    "end-of-call-report",
+    "function-call",
+    "hang",
+    "speech-update",
+    "status-update",
+    "tool-calls",
+    "transfer-destination-request",
+    "handoff-destination-request",
+    "user-interrupted",
+    "assistant.started"
+  ],
+  "endCallPhrases": [
+    "goodbye",
+    "bye",
+    "that's all for today"
+  ],
+  "hipaaEnabled": false,
+  "backgroundDenoisingEnabled": true,
+  "artifactPlan": {
+    "structuredOutputIds": [
+      "dedc6538-ad35-42b2-935b-2495e35fff75"
+    ],
+    "scorecardIds": [
+      "b7b5acbb-796d-4a96-9354-98bcba5b5e47"
+    ]
+  },
+  "startSpeakingPlan": {
+    "waitSeconds": 0.4,
+    "smartEndpointingEnabled": true,
+    "smartEndpointingPlan": {
+      "provider": "vapi"
+    }
+  },
+  "server": {
+    "url": "https://carecallerai.vercel.app/api/vapi",
+    "timeoutSeconds": 20
+  },
+  "isServerUrlSecretSet": true
+}
