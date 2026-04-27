@@ -76,6 +76,8 @@ flowchart LR
     N[Home page ElevenLabs agent] --> J
 ```
 
+![AI Architecture Diagram](docs/diagram-1776016571239.png)
+
 ## Innovations Worth Calling Out
 
 - `Autonomous agents without context loss`
